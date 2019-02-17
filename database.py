@@ -1,7 +1,8 @@
 import math
 import os
 import json
-from flask import Flask, request,  abort
+from flask import Flask, request, abort, jsonify, url_for
+from passlib.apps import custom_app_context as pwd_context
 
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
@@ -44,12 +45,40 @@ class User(db.Model):
     event = db.relationship("Event", back_populates="creator")
 
 
+# model for logining in, going go hash the password with hash_password methods and also verify the password with verify_password
+class LoginUser(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(32), index=True)
+    password_hash = db.Column(db.String(128))
+
+    def hash_password(self, password):
+        self.password_hash = pwd_context.encrypt(password)
+
+    def verify_password(self, password):
+        return pwd_context.verify(password, self.password_hash)
+
+
 users = db.Table("joinedusers",
                  db.Column("user_id", db.Integer, db.ForeignKey(
                            "user.id"), primary_key=True),
                  db.Column("event_id", db.Integer, db.ForeignKey(
                            "event.id"), primary_key=True)
                  )
+
+
+# @app.route('/api/users/', methods=['POST'])
+# def new_user():
+#     username = request.json.get('username')
+#     password = request.json.get('password')
+#     if username is None or password is None:
+#         abort(400)  # missing arguments
+#     if LoginUser.query.filter_by(username=username).first() is not None:
+#         abort(400)  # existing user
+#     user = LoginUser(username=username)
+#     user.hash_password(password)
+#     db.session.add(user)
+#     db.session.commit()
+#     return jsonify({'username': user.username, 'password': user.password_hash}), 201
 
 # @app.route("/user/add/", methods=["POST"])
 # def add_user():
