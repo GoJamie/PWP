@@ -33,7 +33,7 @@ users = db.Table("joinedusers",
 
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(32), nullable=False, unique=True)
+    name = db.Column(db.String(32), nullable=False, unique=False)
     description = db.Column(db.String(256), nullable=False)
     history = db.Column(db.Boolean, nullable=False)
     place = db.Column(db.String(32), nullable=True)
