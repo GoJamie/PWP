@@ -8,4 +8,16 @@
 * Student 2. Nechir Salimi nechir123@hotmail.com
 * Student 3. Hao Ban s8125867@qq.com
 
+# Reqiurements
+```
+flask
+pytest
+passlib
+```
 
+# Run Database Test
+* 1. Go to root folder
+* 2. In command line
+```
+pytest test.py
+```
