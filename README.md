@@ -16,8 +16,8 @@ passlib
 ```
 
 # Run Database Test
-* 1. Go to root folder
-* 2. In command line
+* Go to root folder
+* In command line
 ```
 pytest test.py
 ```
