@@ -1,3 +1,4 @@
 
 __pycache__/database.cpython-37.pyc
 *.pyc
+.cache/v/cache/lastfailed

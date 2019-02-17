@@ -30,11 +30,11 @@ def db_handle():
     os.close(db_fd)
     os.unlink(db_fname)
 
-def _get_event(sitename="alpha"):
+def _get_event():
     return Event(
         name='PWP Meeting',
         history=False,
-        description="test site {}".format(sitename),
+        description="Test event"
     )
 
 def _get_user():
@@ -42,8 +42,8 @@ def _get_user():
         name='Bangju Wang',
     )
     
-def _get_loginuser():
-    user = LoginUser(username='user-1')
+def _get_loginuser(number=1):
+    user = LoginUser(username='user-{}'.format(number))
     user.hash_password('password')
     return user
 
@@ -81,3 +81,92 @@ def test_create_instances(db_handle):
     assert db_loginuser.user == db_user
     assert db_user in db_event.joined_users
     assert db_event in db_user.joined_events
+
+def test_user_loginuser_one_to_one(db_handle):
+    """
+    Tests that the relationship between user and loginuser is one-to-one.
+    i.e. that we cannot assign the same user for two loginusers.
+    """
+    
+    user = _get_user()
+    loginuser_1 = _get_loginuser(1)
+    loginuser_2 = _get_loginuser(2)
+    loginuser_1.user = user
+    loginuser_2.user = user
+    db_handle.session.add(user)
+    db_handle.session.add(loginuser_1)
+    db_handle.session.add(loginuser_2)    
+    with pytest.raises(IntegrityError):
+        db_handle.session.commit()
+
+def test_event_ondelete_creator(db_handle):
+    """
+    Tests that Event's creator foreign key is set to null when the creator
+    is deleted.
+    """
+    
+    user = _get_user()
+    event = _get_event()
+    event.creator = user
+    db_handle.session.add(event)
+    db_handle.session.commit()
+    db_handle.session.delete(user)
+    db_handle.session.commit()
+    assert event.creator is None
+
+def test_event_columns(db_handle):
+    """
+    Tests the types and restrictions of event columns. Checks that name must be unique, 
+    and name, description and history must be mandatory. 
+    """
+    
+    event_1 = _get_event()
+    event_2 = _get_event()
+    db_handle.session.add(event_1)
+    db_handle.session.add(event_2)    
+    with pytest.raises(IntegrityError):
+        db_handle.session.commit()
+
+    db_handle.session.rollback()
+    
+    event = _get_event()
+    event.name = None
+    db_handle.session.add(event)
+    with pytest.raises(IntegrityError):
+        db_handle.session.commit()
+    
+    db_handle.session.rollback()
+    
+    event = _get_event()
+    event.description = None
+    db_handle.session.add(event)
+    with pytest.raises(IntegrityError):
+        db_handle.session.commit()
+        
+    db_handle.session.rollback()
+
+    event = _get_event()
+    event.history = None
+    db_handle.session.add(event)
+    with pytest.raises(IntegrityError):
+        db_handle.session.commit()
+
+def test_user_columns(db_handle):
+    """
+    Tests the types and restrictions of user columns. Checks that name must be unique and mandatory. 
+    """
+    
+    user_1 = _get_user()
+    user_2 = _get_user()
+    db_handle.session.add(user_1)
+    db_handle.session.add(user_2)    
+    with pytest.raises(IntegrityError):
+        db_handle.session.commit()
+
+    db_handle.session.rollback()
+    
+    user = _get_user()
+    user.name = None
+    db_handle.session.add(user)
+    with pytest.raises(IntegrityError):
+        db_handle.session.commit()
