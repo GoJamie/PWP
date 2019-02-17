@@ -23,6 +23,13 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
     cursor.close()
 
 
+users = db.Table("joinedusers",
+                 db.Column("user_id", db.Integer, db.ForeignKey(
+                           "user.id"), primary_key=True),
+                 db.Column("event_id", db.Integer, db.ForeignKey(
+                           "event.id"), primary_key=True)
+                 )
+
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(32), nullable=False, unique=True)
@@ -30,26 +37,25 @@ class Event(db.Model):
     history = db.Column(db.Boolean, nullable=False)
     place = db.Column(db.String(32), nullable=True)
     time = db.Column(db.DateTime, nullable=True)
-
-    creator = db.relationship(
-        "User", back_populates="event", uselist=False)
-
+    creator = db.relationship("User", back_populates="events")
+    creator_id = db.Column(db.Integer,db.ForeignKey("user.id"))
+    joined_users = db.relationship("User", secondary=users, back_populates="joined_events")
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    time = db.Column(db.DateTime, nullable=True)
     picture = db.Column(db.String(256), nullable=True)
     name = db.Column(db.String(32), nullable=False, unique=True)
-    location = db.Column(db.String(32), nullable=False, unique=True)
-    event_id = db.Column(db.Integer, db.ForeignKey("event.id"))
-    event = db.relationship("Event", back_populates="creator")
-
+    location = db.Column(db.String(32), nullable=True, unique=True)
+    events = db.relationship("Event", back_populates="creator")
+    loginuser = db.relationship("LoginUser", back_populates='user')
+    joined_events = db.relationship("Event",secondary=users,back_populates="joined_users")
 
 # model for logining in, going go hash the password with hash_password methods and also verify the password with verify_password
 class LoginUser(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, db.ForeignKey("user.id"), primary_key=True)
     username = db.Column(db.String(32), index=True)
     password_hash = db.Column(db.String(128))
+    user = db.relationship("User",back_populates='loginuser',uselist=False)
 
     def hash_password(self, password):
         self.password_hash = pwd_context.encrypt(password)
@@ -57,13 +63,6 @@ class LoginUser(db.Model):
     def verify_password(self, password):
         return pwd_context.verify(password, self.password_hash)
 
-
-users = db.Table("joinedusers",
-                 db.Column("user_id", db.Integer, db.ForeignKey(
-                           "user.id"), primary_key=True),
-                 db.Column("event_id", db.Integer, db.ForeignKey(
-                           "event.id"), primary_key=True)
-                 )
 
 
 # @app.route('/api/users/', methods=['POST'])

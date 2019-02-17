@@ -7,8 +7,8 @@ from sqlalchemy.engine import Engine
 from sqlalchemy import event
 from sqlalchemy.exc import IntegrityError, StatementError
 
-import database
-from database import Event, User
+import app
+from app import Location, Sensor, Deployment, Measurement
 
 @event.listens_for(Engine, "connect")
 def set_sqlite_pragma(dbapi_connection, connection_record):
@@ -16,6 +16,8 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
     cursor.execute("PRAGMA foreign_keys=ON")
     cursor.close()
 
+# based on http://flask.pocoo.org/docs/1.0/testing/
+# we don't need a client for database testing, just the db handle
 @pytest.fixture
 def db_handle():
     db_fd, db_fname = tempfile.mkstemp()
@@ -30,20 +32,17 @@ def db_handle():
     os.close(db_fd)
     os.unlink(db_fname)
 
-def _get_event(sitename="alpha"):
-    return Event(
-        id=1,
-        name='PWP Meeting',
-        history=False,
-        place='University of Oulu',
-        time=datetime(2019, 1, 1, 0, 0, 1),
+def _get_location(sitename="alpha"):
+    return Location(
+        latitude=63.3,
+        longitude=22.6,
+        altitude=24.5,
         description="test site {}".format(sitename)
     )
 
-def _get_user(number=1):
+def _get_sensor(number=1):
     return Sensor(
-        id
-        name="user-{}".format(number),
+        name="donkeysensor-{}".format(number),
         model="donkeysensor2000",
     )
     
