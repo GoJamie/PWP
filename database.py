@@ -45,7 +45,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     picture = db.Column(db.String(256), nullable=True)
     name = db.Column(db.String(32), nullable=False, unique=True)
-    location = db.Column(db.String(32), nullable=True, unique=Falses)
+    location = db.Column(db.String(32), nullable=True, unique=False)
     events = db.relationship("Event", back_populates="creator")
     loginuser = db.relationship("LoginUser", back_populates='user')
     joined_events = db.relationship("Event",secondary=users,back_populates="joined_users")
