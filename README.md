@@ -16,5 +16,5 @@ passlib
 * Go to root folder
 * In command line
 ```
-pytest test.py
+pytest db_test.py
 ```
