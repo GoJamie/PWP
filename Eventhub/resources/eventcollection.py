@@ -1,8 +1,8 @@
 from flask_restful import Resource
 
-class eventcollection(Resource):
+
+class EventCollection(Resource):
 
     def get(self, handle):
 
     def put(self, handle):
-
