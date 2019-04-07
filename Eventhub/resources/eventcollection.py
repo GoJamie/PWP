@@ -4,6 +4,7 @@ from flask import Flask, request, abort, Response, current_app
 from .eventitem import EventItem
 from ..models import Event
 from ..utils import InventoryBuilder, MasonBuilder
+import json
 
 LINK_RELATIONS_URL = "/eventhub/link-relations/"
 USER_PROFILE = "/profiles/user/"
@@ -16,7 +17,8 @@ ERROR_PROFILE = "/profiles/error/"
 
 class EventCollection(Resource):
     api = Api(current_app)
-    def get(self, handle):
+    def get(self):
+        print("11111")
         try:
             events = Event.query.all()
             body = InventoryBuilder(items=[])
@@ -32,8 +34,8 @@ class EventCollection(Resource):
             body.add_control_all_events()
             body.add_control_add_event()
             return Response(json.dumps(body), 200, mimetype=MASON)
-        except (KeyError, ValueError, IntegrityError):
+        except (KeyError, ValueError):
             abort(400)
 
-    def put(self, handle):
+    def put(self):
         return
