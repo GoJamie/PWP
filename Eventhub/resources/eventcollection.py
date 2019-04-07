@@ -1,9 +1,9 @@
 from flask_restful import Resource
 
 from flask import Flask, request, abort, Response, current_app
-from resources.eventitem import EventItem
-from models import Event
-from utils import InventoryBuilder, MasonBuilder
+from .eventitem import EventItem
+from ..models import Event
+from ..utils import InventoryBuilder, MasonBuilder
 
 api = Api(current_app)
 
@@ -39,6 +39,4 @@ class EventCollection(Resource):
             abort(400)
 
     def put(self, handle):
-
-
-api.add_resource(ProductCollection, "/api/events/")
+        return

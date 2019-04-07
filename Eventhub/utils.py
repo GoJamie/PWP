@@ -1,7 +1,7 @@
 
 from flask import Flask, request, abort, Response, current_app
-from resources.eventitem import EventItem
-from resources.useritem import UserItem
+from .resources.eventitem import EventItem
+from .resources.useritem import UserItem
 from flask_restful import Api
 import json
 api = Api(current_app)
@@ -195,9 +195,7 @@ class InventoryBuilder(MasonBuilder):
             schema=self.event_schema()
         )
 
-
-
-   def add_control_delete_user(self, id):
+    def add_control_delete_user(self, id):
         self.add_control(
             "userhub:delete",
             href=api.url_for(UserItem, id=id),

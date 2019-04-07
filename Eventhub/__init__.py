@@ -1,7 +1,7 @@
+
 import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-
 from flask_restful import Api
 db = SQLAlchemy()
 
@@ -17,7 +17,6 @@ def create_app(test_config=None):
         #    SQLALCHEMY_TRACK_MODIFICATIONS=False
         DATABASE=os.path.join(app.instance_path, 'Eventhub.sqlite'),
     )
-    api = Api(app)
 
     if test_config is None:
         app.config.from_pyfile("config.py", silent=True)
@@ -33,5 +32,11 @@ def create_app(test_config=None):
     def hello():
         return 'Hello, World!'
 
-    db.init_app(app)
+
     return app
+
+from .resources.eventcollection import EventCollection
+
+api = Api(app)
+
+api.add_resource(EventCollection, "/api/events/")
