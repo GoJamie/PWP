@@ -3,6 +3,7 @@ import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Api
+
 db = SQLAlchemy()
 
 # Based on http://flask.pocoo.org/docs/1.0/tutorial/factory/#the-application-factory
@@ -34,6 +35,12 @@ def create_app(test_config=None):
 
 
     return app
+
+app = create_app()
+
+app.app_context().push()
+
+db.init_app(app)
 
 from .resources.eventcollection import EventCollection
 

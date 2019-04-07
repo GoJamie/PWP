@@ -4,7 +4,6 @@ from .resources.eventitem import EventItem
 from .resources.useritem import UserItem
 from flask_restful import Api
 import json
-api = Api(current_app)
 
 
 class MasonBuilder(dict):
@@ -98,7 +97,7 @@ def create_event_error_response(status_code, title, message=None):
 
 
 class InventoryBuilder(MasonBuilder):
-
+    api = Api(current_app)
     @staticmethod
     def event_schema():
         schema = {

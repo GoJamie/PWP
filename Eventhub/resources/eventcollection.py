@@ -1,12 +1,9 @@
-from flask_restful import Resource
+from flask_restful import Resource, Api
 
 from flask import Flask, request, abort, Response, current_app
 from .eventitem import EventItem
 from ..models import Event
 from ..utils import InventoryBuilder, MasonBuilder
-
-api = Api(current_app)
-
 
 LINK_RELATIONS_URL = "/eventhub/link-relations/"
 USER_PROFILE = "/profiles/user/"
@@ -18,7 +15,7 @@ ERROR_PROFILE = "/profiles/error/"
 
 
 class EventCollection(Resource):
-
+    api = Api(current_app)
     def get(self, handle):
         try:
             events = Event.query.all()
