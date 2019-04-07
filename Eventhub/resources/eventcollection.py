@@ -37,5 +37,43 @@ class EventCollection(Resource):
         except (KeyError, ValueError):
             abort(400)
 
-    def put(self):
-        return
+     def post(self):
+        if not request.json:
+            return create_error_response(415, "Unsupported media type",
+                                         "Requests must be JSON"
+                                         )
+
+        try:
+            validate(request.json, InventoryBuilder.event_schema())
+        except ValidationError as e:
+            return create_error_response(400, "Invalid JSON document", str(e))
+
+        event = Event(
+            id=request.json["id"],
+            name=request.json["name"],
+            description=request.json["description"]
+            place=request.json["place"],
+            time=request.json["time"],
+            creator=request.json["creator"]
+        )
+
+        try:
+
+            body = InventoryBuilder()
+            db.session.add(event)
+            db.session.commit()
+
+            body.add_control("self", api.url_for(
+                EventItem, id=event.id))
+
+            return Response(json.dumps(body), 201, mimetype=MASON)
+        except IntegrityError:
+            return create_error_response(409, "Already exists",
+                                         "Product with handle '{}' already exists.".format(
+                                             request.json["handle"])
+                                         )
+
+        return Response(status=201, headers={
+            "Location": api.url_for(EventItem, id=request.json["id"])
+        })
+        
