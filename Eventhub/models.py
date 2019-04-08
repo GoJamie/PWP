@@ -36,7 +36,7 @@ class Event(db.Model):
     name = db.Column(db.String(32), nullable=False, unique=False)
     description = db.Column(db.String(256), nullable=False)
     place = db.Column(db.String(32), nullable=True)
-    time = db.Column(db.DateTime, nullable=True)
+    time = db.Column(db.String(32), nullable=True)
     creator = db.relationship("User", back_populates="events")
     creator_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     joined_users = db.relationship(

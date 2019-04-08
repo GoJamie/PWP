@@ -6,6 +6,7 @@ from flask_restful import Api
 import json
 
 
+
 class MasonBuilder(dict):
     """
     A convenience class for managing dictionaries that represent Mason
@@ -97,7 +98,7 @@ def create_event_error_response(status_code, title, message=None):
 
 
 class InventoryBuilder(MasonBuilder):
-    api = Api(current_app)
+    
     @staticmethod
     def event_schema():
         schema = {
@@ -116,8 +117,8 @@ class InventoryBuilder(MasonBuilder):
 
         props["description"] = {
             "description": "description of the event's model",
-            "type": "number"
-        },
+            "type": "string"
+        }
         props["place"] = {
             "description": "place of the event's model",
             "type": "string"
@@ -125,7 +126,7 @@ class InventoryBuilder(MasonBuilder):
 
         props["time"] = {
             "description": "time of the event's model",
-            "type": "DateTime"
+            "type": "string"
         }
 
         return schema
@@ -157,6 +158,7 @@ class InventoryBuilder(MasonBuilder):
         return schema
 
     def add_control_delete_event(self, id):
+        api = Api(current_app)
         self.add_control(
             "eventhub:delete",
             href=api.url_for(EventItem, id=id),
@@ -184,7 +186,7 @@ class InventoryBuilder(MasonBuilder):
         )
 
     def add_control_edit_event(self, id):
-
+        api = Api(current_app)
         self.add_control(
             "edit",
             href=api.url_for(EventItem, id=id),
@@ -195,6 +197,7 @@ class InventoryBuilder(MasonBuilder):
         )
 
     def add_control_delete_user(self, id):
+        api = Api(current_app)
         self.add_control(
             "userhub:delete",
             href=api.url_for(UserItem, id=id),
@@ -222,6 +225,7 @@ class InventoryBuilder(MasonBuilder):
         )
 
     def add_control_edit_user(self, id):
+        api = Api(current_app)
 
         self.add_control(
             "edit",
