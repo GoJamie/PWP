@@ -62,9 +62,13 @@ from .resources.usercollection import UserCollection
 
 from .resources.useritem import UserItem
 
+
+from .resources.eventsbyuser import EventsByUser
+
 api = Api(app)
 
 api.add_resource(EventCollection, "/api/events/")
 api.add_resource(UserCollection, "/api/users/")
 api.add_resource(EventItem, "/api/events/<id>/")
 api.add_resource(UserItem, "/api/users/<id>/")
+api.add_resource(EventsByUser, "/api/users/<id>/events/")

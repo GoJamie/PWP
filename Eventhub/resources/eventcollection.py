@@ -38,7 +38,7 @@ class EventCollection(Resource):
                 item = MasonBuilder(
                     id=j.id, name=j.name, description=j.description, place=j.place, time=j.time,creator=user, joined_users=j.joined_users)
                 item.add_control("self", api.url_for(
-                    EventItem, handle=j.id))
+                    EventItem, id=j.id))
                 item.add_control("profile", "/profiles/event/")
                 body["items"].append(item)
             body.add_namespace("eventhub", LINK_RELATIONS_URL)
@@ -83,7 +83,7 @@ class EventCollection(Resource):
             body = InventoryBuilder()
             db.session.add(event)
             db.session.commit()
-
+            print(api.url_for(EventItem, id=event.id))
 
         except IntegrityError:
             return create_event_error_response(409, "Already exists",
@@ -91,5 +91,6 @@ class EventCollection(Resource):
                                                )
     
         return Response(status=201, headers={
-            "Location": api.url_for(EventItem, handle=event.id)
+            "Location": api.url_for(EventItem, id=event.id)
+        
         })
