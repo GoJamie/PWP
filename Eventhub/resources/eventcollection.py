@@ -63,7 +63,7 @@ class EventCollection(Resource):
         except ValidationError as e:
             return create_event_error_response(400, "Invalid JSON document", str(e))
         
-        loginuser = LoginUser(username='user-{}'.format(1))
+        loginuser = LoginUser(username='user-{}'.format(2))
         loginuser.hash_password('password')
         user = User(
         name='Bangju Wang')
@@ -74,6 +74,13 @@ class EventCollection(Resource):
         )
         loginuser.user = user
         event.creator = user
+    
+        events = Event.query.all()
+        
+        a = LoginUser.query.all()
+        print(a)
+        
+        event.id = len(events) + 1
 
         try:
 
@@ -85,12 +92,11 @@ class EventCollection(Resource):
             db.session.commit()
 
 
-            return Response(json.dumps(body), 201, mimetype=MASON)
         except IntegrityError:
             return create_event_error_response(409, "Already exists",
-                                               "Product with handle '{}' already exists.".format("asasd")
+                                               "Product with handle '{}' already exists.".format(event.id)
                                                )
-
+    
         return Response(status=201, headers={
-            "Location": api.url_for(EventItem, id=request.json["id"])
+            "Location": api.url_for(EventItem, id=event.id)
         })
