@@ -6,8 +6,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, request, abort, Response, current_app
 from Eventhub import db
 from ..models import Event,LoginUser, User
-# from .eventcollection import EventCollection
-# from ..utils import InventoryBuilder, MasonBuilder, create_event_error_response
+#from .eventcollection import EventCollection
+#from ..utils import InventoryBuilder, MasonBuilder, create_event_error_response
 import json
 from jsonschema import validate, ValidationError
 
@@ -16,19 +16,17 @@ LINK_RELATIONS_URL = "/eventhub/link-relations/"
 USER_PROFILE = "/profiles/user/"
 ERROR_PROFILE = "/profiles/error/"
 MASON = "application/vnd.mason+json"
-
 EVENT_PROFILE = "/profiles/EVENT/"
-ERROR_PROFILE = "/profiles/error/"
 
 class EventItem(Resource):
     api = Api(current_app)
-    def get(self, handle):
+    def get(self, id):
     
-        db_event = Event.query.filter_by(handle=handle).first()
+        db_event = Event.query.filter_by(id=id).first()
         if db_event is None:
             return create_error_response(404, "Not found",
-                                         "No event was found with the handle {}".format(
-                                             handle)
+                                         "No event was found with the id {}".format(
+                                             id)
                                          )
 
         body = InventoryBuilder(
@@ -37,7 +35,6 @@ class EventItem(Resource):
             description=db_event.description,
             place=db_event.place,
             time=db_event.time
-
         )
         body.add_namespace("eventhub", LINK_RELATIONS_URL)
         body.add_control("self", api.url_for(EventItem, id=id))
