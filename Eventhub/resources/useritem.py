@@ -52,7 +52,6 @@ class UserItem(Resource):
         body.add_control_delete_user(id)
         body.add_control_edit_user(id)
         body.add_control_all_users()
-        print("success!")
         return Response(json.dumps(body), 200, mimetype=MASON)
 
 
@@ -93,6 +92,42 @@ class UserItem(Resource):
                                              request.json["handle"])
                                          )
 
+        return Response(status=204, headers={
+            "Location": api.url_for(UserItem, id=request.json["id"])
+        })
+
+    def delete(self, id):
+        '''
+        user = User(
+            id=request.json["id"]
+        )
+        
+        loginUser = LoginUser(
+            id=request.json["id"]
+        )
+
+        db_user = User.query.filter_by(id=id).first()
+        loginUser = LoginUser.query.filter_by(id=id).first()
+        '''
+        api = Api(current_app)
+        user=db.session.query(LoginUser).get(id)
+
+
+        if user is None:
+            return create_error_response(404, "Doesn't exists",
+                                         "user with id '{}' doesn't exists.".format(
+                                             request.json["id"])
+                                         )
+
+
+        #db.session.delete(db_user)
+        #db.session.commit()
+        
+        print(user)
+
+        db.session.delete(user)
+        db.session.commit()
+    
         return Response(status=204, headers={
             "Location": api.url_for(UserItem, id=request.json["id"])
         })
