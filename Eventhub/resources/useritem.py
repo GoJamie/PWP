@@ -1,4 +1,4 @@
-from flask_restful import Resource
+from flask_restful import Resource, Api
 
 from sqlalchemy.exc import IntegrityError
 from flask_sqlalchemy import SQLAlchemy
@@ -44,10 +44,6 @@ class UserItem(Resource):
         body.add_control_all_user()
         print("success!")
         return Response(json.dumps(body), 200, mimetype=MASON)
-
-
-    def post(self, handle):
-        return
 
 
     def put(self, id):

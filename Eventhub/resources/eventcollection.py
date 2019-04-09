@@ -25,7 +25,6 @@ class EventCollection(Resource):
     def get(self):
         api = Api(current_app)
 
-        print("11111")
         try:
             events = Event.query.all()
             body = InventoryBuilder(items=[])

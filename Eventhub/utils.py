@@ -81,7 +81,7 @@ EVENT_PROFILE = "/profiles/EVENT/"
 ERROR_PROFILE = "/profiles/error/"
 
 
-def create__user_error_response(status_code, title, message=None):
+def create_user_error_response(status_code, title, message=None):
     resource_url = request.path
     body = MasonBuilder(resource_url=resource_url)
     body.add_error(title, message)
