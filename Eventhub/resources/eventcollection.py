@@ -45,7 +45,7 @@ class EventCollection(Resource):
             body.add_namespace("eventhub", LINK_RELATIONS_URL)
             body.add_control_all_events()
             body.add_control_add_event()
-            print(body)
+            
             
             return Response(json.dumps(body), 200, mimetype=MASON)
         except (KeyError, ValueError):
@@ -63,31 +63,25 @@ class EventCollection(Resource):
         except ValidationError as e:
             return create_event_error_response(400, "Invalid JSON document", str(e))
         
-        loginuser = LoginUser(username='user-{}'.format(2))
-        loginuser.hash_password('password')
-        user = User(
-        name='Bangju Wang')
-        loginuser.user = user
+        user = User.query.filter_by(id=request.json["creatorId"]).first()
+      
         event = Event(
-        name='PWP Meeting',
-        description="Test event"
+            name = request.json["name"],
+            description = request.json["description"],
+            place = request.json["place"],
+            creator_id = request.json["creatorId"]
+
         )
-        loginuser.user = user
+
         event.creator = user
     
         events = Event.query.all()
-        
-        a = LoginUser.query.all()
-        print(a)
         
         event.id = len(events) + 1
 
         try:
 
             body = InventoryBuilder()
-                    
-            db.session.add(user)
-            db.session.add(loginuser)
             db.session.add(event)
             db.session.commit()
 
@@ -98,5 +92,5 @@ class EventCollection(Resource):
                                                )
     
         return Response(status=201, headers={
-            "Location": api.url_for(EventItem, id=event.id)
+            "Location": api.url_for(EventItem, handle=event.id)
         })
