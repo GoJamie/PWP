@@ -26,19 +26,12 @@ class EventsByUser(Resource):
         api = Api(current_app)
 
         try:
-            users = User.query.all()
+            
+            events = Event.query.all()
+            for j in events:
+                joined_users = j.joined_users
+                print(joined_users)
             body = InventoryBuilder(items=[])
-            for j in users:
-                item = MasonBuilder(id=j.id, name=j.name, place=j.location, joined_events=j.joined_events)
-                item.add_control("self", api.url_for(
-                    UserItem, id=j.id))
-                item.add_control("profile", "/profiles/user/")
-                body["items"].append(item)
-            body.add_namespace("eventhub", LINK_RELATIONS_URL)
-            body.add_control_all_users()
-            body.add_control_add_user()
-            print(body)
-
             return Response(json.dumps(body), 200, mimetype=MASON)
         except (KeyError, ValueError):
             abort(400)
