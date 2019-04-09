@@ -38,7 +38,7 @@ class User(db.Model):
     name = db.Column(db.String(32), nullable=False, unique=False)
     location = db.Column(db.String(32), nullable=True, unique=False)
     events = db.relationship("Event", back_populates="creator")
-    loginuser = db.relationship("LoginUser", back_populates='user', lazy="joined")
+    loginuser = db.relationship("LoginUser", back_populates='user', passive_deletes=True)
     joined_events = db.relationship(
         "Event", secondary=users, back_populates="joined_users")
 
@@ -46,10 +46,10 @@ class User(db.Model):
 
 
 class LoginUser(db.Model):
-    id = db.Column(db.Integer, db.ForeignKey("user.id"), primary_key=True)
+    id = db.Column(db.Integer, db.ForeignKey("user.id", ondelete='CASCADE'), primary_key=True)
     username = db.Column(db.String(32), index=True, unique=True)
     password_hash = db.Column(db.String(128))
-    user = db.relationship("User", back_populates='loginuser', uselist=False,  cascade="all, delete-orphan", lazy="joined")
+    user = db.relationship("User", back_populates='loginuser', uselist=False)
 
     def hash_password(self, password):
         self.password_hash = pwd_context.encrypt(password)
