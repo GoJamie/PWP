@@ -22,16 +22,20 @@ ERROR_PROFILE = "/profiles/error/"
 
 class EventsByUser(Resource):
 
-    def get(self, id):
+    def get(self, user_id):
         api = Api(current_app)
-
+        body = InventoryBuilder(items=[])
         try:
             
             events = Event.query.all()
             for j in events:
                 joined_users = j.joined_users
-                print(joined_users)
-            body = InventoryBuilder(items=[])
+                for i in joined_users:
+                    user = {}
+                    user["id"] = i.id
+                    user["name"] = i.name
+                    item = MasonBuilder(id=i.id,name=i.name)
+                    body["items"].append(item)
             return Response(json.dumps(body), 200, mimetype=MASON)
         except (KeyError, ValueError):
             abort(400)
