@@ -8,6 +8,7 @@ from ..models import Event,LoginUser, User
 from ..utils import InventoryBuilder, MasonBuilder, create_event_error_response
 import json
 from jsonschema import validate, ValidationError
+from .eventsbyuser import EventsByUser
 
 LINK_RELATIONS_URL = "/eventhub/link-relations/"
 USER_PROFILE = "/profiles/user/"
@@ -20,12 +21,11 @@ class JoinEvent(Resource):
 
     api = Api(current_app)
 
-    def put(self, id):
+    def put(self, user_id, event_id):
         if not request.json:
             return create_error_response(415, "Unsupported media type",
                                          "Requests must be JSON"
                                          )
-
         if db_user is None:
             return create_error_response(404, "Not found",
                                          "No product was found with the id {}".format(
@@ -33,12 +33,11 @@ class JoinEvent(Resource):
                                          )
 
         try:
-            validate(request.json, InventoryBuilder.user_schema())
-        except ValidationError as e:
-            return create_error_response(400, "Invalid JSON document", str(e))
-
-        try:
+            event = Event.query.filter_by(id=event_id).first()
+            user = User.query.filter_by(id=user_id).first()
+            event.joined_user.append(user)
             db.session.commit()
+
         except IntegrityError:
             return create_error_response(409, "Already exists",
                                          "user with name '{}' already exists.".format(
@@ -46,5 +45,5 @@ class JoinEvent(Resource):
                                          )
 
         return Response(status=204, headers={
-            "Location": api.url_for(UserItem, id=request.json["id"])
+            "Location": api.url_for(EventsbyUser, id=user_id)
         })

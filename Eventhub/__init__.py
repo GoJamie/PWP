@@ -74,4 +74,4 @@ api.add_resource(EventItem, "/api/events/<id>/")
 api.add_resource(UserItem, "/api/users/<id>/")
 api.add_resource(EventsByUser, "/api/users/<user>/events/")
 
-api.add_resource(JoinEvent, "/api/users/<user>/events/<user>/")
+api.add_resource(JoinEvent, "/api/users/<user_id>/events/<event_id>/")
