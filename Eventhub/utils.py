@@ -1,7 +1,5 @@
 
 from flask import Flask, request, abort, Response, current_app
-from .resources.eventitem import EventItem
-from .resources.useritem import UserItem
 from flask_restful import Api
 import json
 
@@ -158,6 +156,7 @@ class InventoryBuilder(MasonBuilder):
         return schema
 
     def add_control_delete_event(self, id):
+        from .resources.eventitem import EventItem
         api = Api(current_app)
         self.add_control(
             "eventhub:delete",
@@ -186,6 +185,7 @@ class InventoryBuilder(MasonBuilder):
         )
 
     def add_control_edit_event(self, id):
+        from .resources.eventitem import EventItem
         api = Api(current_app)
         self.add_control(
             "edit",
@@ -197,6 +197,7 @@ class InventoryBuilder(MasonBuilder):
         )
 
     def add_control_delete_user(self, id):
+        from .resources.useritem import UserItem
         api = Api(current_app)
         self.add_control(
             "userhub:delete",
@@ -225,6 +226,8 @@ class InventoryBuilder(MasonBuilder):
         )
 
     def add_control_edit_user(self, id):
+        from .resources.useritem import UserItem
+
         api = Api(current_app)
 
         self.add_control(

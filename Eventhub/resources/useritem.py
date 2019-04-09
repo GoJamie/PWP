@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, request, abort, Response, current_app
 from Eventhub import db
 from ..models import Event,LoginUser, User
-#from ..utils import InventoryBuilder, MasonBuilder, create_event_error_response
+from ..utils import InventoryBuilder, MasonBuilder, create_event_error_response
 import json
 from jsonschema import validate, ValidationError
 
@@ -21,8 +21,19 @@ class UserItem(Resource):
     api = Api(current_app)
 
     def get(self, id):
-    
+        api = Api(current_app)
         db_user = User.query.filter_by(id=id).first()
+        events = Event.query.filter_by(creator_id=id).all()
+        events_list = []
+        for j in events:
+            item = {}
+            item["id"] = j.id
+            item["name"] = j.name
+            item["description"] = j.description
+            item["place"] = j.place
+            item["time"] = j.time
+            events_list.append(item)
+
         if db_user is None:
             return create_error_response(404, "Not found",
                                          "No user was found with the id {}".format(
@@ -33,15 +44,14 @@ class UserItem(Resource):
             id=db_user.id,
             name=db_user.name,
             location=db_user.location,
-            Created_events =db_user.events,
-            Joined_events =db_user.joined_events
+            Created_events =events_list
         )
         body.add_namespace("eventhub", LINK_RELATIONS_URL)
         body.add_control("self", api.url_for(UserItem, id=id))
         body.add_control("profile", USER_PROFILE)
         body.add_control_delete_user(id)
         body.add_control_edit_user(id)
-        body.add_control_all_user()
+        body.add_control_all_users()
         print("success!")
         return Response(json.dumps(body), 200, mimetype=MASON)
 
