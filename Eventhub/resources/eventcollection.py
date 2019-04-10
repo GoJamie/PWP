@@ -30,17 +30,21 @@ class EventCollection(Resource):
             body = InventoryBuilder(items=[])
 
             for j in events:
-                user = {}
-                user["id"] = j.creator.id
-                
-                user["name"] = j.creator.name
+                if(j.creator != None):
+                        
+                    user = {}
 
-                item = MasonBuilder(
-                    id=j.id, name=j.name, description=j.description, place=j.place, time=j.time,creator=user, joined_users=j.joined_users)
-                item.add_control("self", api.url_for(
-                    EventItem, id=j.id))
-                item.add_control("profile", "/profiles/event/")
-                body["items"].append(item)
+                    user["id"] = j.creator.id
+                    
+                    user["name"] = j.creator.name
+
+                    item = MasonBuilder(
+                        id=j.id, name=j.name, description=j.description, place=j.place, time=j.time,creator=user, joined_users=j.joined_users)
+                    item.add_control("self", api.url_for(
+                        EventItem, id=j.id))
+                    item.add_control("profile", "/profiles/event/")
+                    body["items"].append(item)
+                
             body.add_namespace("eventhub", LINK_RELATIONS_URL)
             body.add_control_all_events()
             body.add_control_add_event()
