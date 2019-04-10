@@ -52,4 +52,38 @@ class EventItem(Resource):
     
         return 
     def put(self, handle):
-        return
+        if not request.json:
+            return create_error_response(415, "Unsupported media type",
+                                         "Requests must be JSON"
+                                         )
+
+        event = Event(
+            id=request.json["id"],
+            name=request.json["name"],
+            place=request.json["place"],
+            time=request.json["time"],
+            description=request.json["decription"],
+        )
+
+        db_event = Event.query.filter_by(id=id).first()
+        if db_event is None:
+            return create_error_response(404, "Not found",
+                                         "No event was found with the id {}".format(
+                                             id)
+                                         )
+
+        try:
+            validate(request.json, InventoryBuilder.user_schema())
+        except ValidationError as e:
+            return create_error_response(400, "Invalid JSON document", str(e))
+
+        try:
+            db_event.id = event.id
+            db_event.name = event.name
+            db_event.place = event.place
+            db.session.commit()
+
+
+        return Response(status=204, headers={
+            "Location": api.url_for(EventItem, id=request.json["id"])
+        })

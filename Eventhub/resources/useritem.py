@@ -84,13 +84,7 @@ class UserItem(Resource):
             db_user.id = user.id
             db_user.name = user.name
             db_user.location = user.location
-            db.session.add(db_user)
             db.session.commit()
-        except IntegrityError:
-            return create_error_response(409, "Already exists",
-                                         "user with name '{}' already exists.".format(
-                                             request.json["handle"])
-                                         )
 
         return Response(status=204, headers={
             "Location": api.url_for(UserItem, id=request.json["id"])
