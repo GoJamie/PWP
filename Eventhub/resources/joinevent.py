@@ -9,6 +9,7 @@ from ..utils import InventoryBuilder, MasonBuilder, create_user_error_response
 import json
 from jsonschema import validate, ValidationError
 from .eventsbyuser import EventsByUser
+from .eventitem import EventItem
 
 LINK_RELATIONS_URL = "/eventhub/link-relations/"
 USER_PROFILE = "/profiles/user/"
@@ -44,4 +45,41 @@ class JoinEvent(Resource):
 
         return Response(status=204, headers={
             "Location": api.url_for(EventsByUser, user_id=user_id)
+        })
+
+    def delete(self, user_id, event_id):
+
+        api = Api(current_app)
+
+        event = Event.query.filter_by(event_id).first()
+        user=db.session.query(User).get(id)
+
+        user_not_event=db.session.query(Event).get(joined_users).query(User).get(user_id)
+
+        if user is None:
+            return create_error_response(404, "Doesn't exists",
+                                         "user with id '{}' doesn't exist.".format(
+                                             user_id)
+                                         )
+
+        if event is None:
+            return create_error_response(404, "Doesn't exists",
+                                         "event with id '{}' doesn't exist.".format(
+                                             event_id)
+                                         )
+
+        if user_not_event is None:
+            return create_error_response(404, "Doesn't exists",
+                                         "user with id '{}' doesn't exist in event with id '{}'.".format(
+                                             user_id, event_id)
+                                         )
+
+        for j in event.joined_users:
+            if j.id == user_id:
+                event.joined_users.remove(j)
+
+        db.session.commit()
+
+        return Response(status=204, headers={
+            "Location": api.url_for(EventItem, id=event_id)
         })
