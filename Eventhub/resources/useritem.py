@@ -71,7 +71,7 @@ class UserItem(Resource):
         db_user = User.query.filter_by(id=id).first()
         if db_user is None:
             return create_error_response(404, "Not found",
-                                         "No product was found with the id {}".format(
+                                         "No user was found with the id {}".format(
                                              id)
                                          )
 
