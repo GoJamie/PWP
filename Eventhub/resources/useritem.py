@@ -33,7 +33,7 @@ class UserItem(Resource):
             item["place"] = j.place
             item["time"] = j.time
             events_list.append(item)
-
+            
         if db_user is None:
             return create_error_response(404, "Not found",
                                          "No user was found with the id {}".format(

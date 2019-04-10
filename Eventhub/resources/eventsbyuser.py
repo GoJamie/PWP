@@ -10,6 +10,7 @@ from ..utils import InventoryBuilder, MasonBuilder, create_user_error_response
 import json
 from Eventhub import db
 from jsonschema import validate, ValidationError
+from .eventitem import EventItem
 
 LINK_RELATIONS_URL = "/eventhub/link-relations/"
 USER_PROFILE = "/profiles/user/"
@@ -18,24 +19,33 @@ MASON = "application/vnd.mason+json"
 
 USER_PROFILE = "/profiles/USER/"
 ERROR_PROFILE = "/profiles/error/"
-
+EVENT_PROFILE = "/profiles/EVENT/"
 
 class EventsByUser(Resource):
 
     def get(self, user_id):
         api = Api(current_app)
         body = InventoryBuilder(items=[])
+        user = User.query.filter_by(id=user_id).first()
+        body["user"] = {"user_id":user.id,"name":user.name}
+        body.add_namespace("eventhub", LINK_RELATIONS_URL)
+        body.add_control("self", api.url_for(UserItem, id=user_id))
+        body.add_control("profile", USER_PROFILE)
+        body.add_control_delete_user(user_id)
+        body.add_control_edit_user(user_id)
+        body.add_control_all_users()        
+
         try:
             
             events = Event.query.all()
             for j in events:
-                event = {}
-                event["id"] = j.id
-                event["name"] = j.name
-                event["creator_id"] = j.creator_id
-                event["place"] = j.place
-                event["time"] = j.time
-                event["description"] = j.description
+                event_body = InventoryBuilder()
+                event_body["id"] = j.id
+                event_body["name"] = j.name
+                event_body["creator_id"] = j.creator_id
+                event_body["place"] = j.place
+                event_body["time"] = j.time
+                event_body["description"] = j.description
                 users = []
                 joined_users = j.joined_users
                 for i in joined_users:
@@ -43,8 +53,14 @@ class EventsByUser(Resource):
                     user["id"] = i.id
                     user["name"] = i.name
                     users.append(user)
-                event["joined_users"] = users
-                body["items"].append(event)
+                event_body["joined_users"] = users
+                event_body.add_namespace("eventhub", LINK_RELATIONS_URL)
+                event_body.add_control("self", api.url_for(EventItem, id=j.id))
+                event_body.add_control("profile", EVENT_PROFILE)
+                event_body.add_control_delete_event(j.id)
+                event_body.add_control_edit_event(j.id)
+                event_body.add_control_all_events()
+                body["items"].append(event_body)            
             return Response(json.dumps(body), 200, mimetype=MASON)
         except (KeyError, ValueError):
             abort(400)
