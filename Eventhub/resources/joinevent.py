@@ -51,10 +51,9 @@ class JoinEvent(Resource):
 
         api = Api(current_app)
 
-        event = Event.query.filter_by(event_id).first()
-        user=db.session.query(User).get(id)
+        event = Event.query.filter_by(id=event_id).first()
+        user=db.session.query(User).get(user_id)
 
-        user_not_event=db.session.query(Event).get(joined_users).query(User).get(user_id)
 
         if user is None:
             return create_error_response(404, "Doesn't exists",
@@ -68,15 +67,18 @@ class JoinEvent(Resource):
                                              event_id)
                                          )
 
-        if user_not_event is None:
-            return create_error_response(404, "Doesn't exists",
-                                         "user with id '{}' doesn't exist in event with id '{}'.".format(
-                                             user_id, event_id)
-                                         )
+        user_not_event = False
 
         for j in event.joined_users:
             if j.id == user_id:
                 event.joined_users.remove(j)
+                user_not_event = True
+
+        if user_not_event:
+            return create_error_response(404, "Doesn't exists",
+                                         "user with id '{}' doesn't exist in event with id '{}'.".format(
+                                             user_id, event_id)
+                                         )
 
         db.session.commit()
 
