@@ -80,11 +80,10 @@ class UserItem(Resource):
         except ValidationError as e:
             return create_error_response(400, "Invalid JSON document", str(e))
 
-        try:
-            db_user.id = user.id
-            db_user.name = user.name
-            db_user.location = user.location
-            db.session.commit()
+        db_user.id = user.id
+        db_user.name = user.name
+        db_user.location = user.location
+        db.session.commit()
 
         return Response(status=204, headers={
             "Location": api.url_for(UserItem, id=request.json["id"])

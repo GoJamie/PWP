@@ -34,12 +34,21 @@ class EventItem(Resource):
                                              id)
                                          )
 
+        joined_users = db_event.joined_users
+        users = []
+        for i in joined_users:
+            user = {}
+            user["name"] = i.name
+            user["id"] = i.id
+            item = MasonBuilder(id=i.id,name=i.name)
+            users.append(item)
         body = InventoryBuilder(
             id=db_event.id,
             name=db_event.name,
             description=db_event.description,
             place=db_event.place,
-            time=db_event.time
+            time=db_event.time,
+            joined_users = users
         )
         body.add_namespace("eventhub", LINK_RELATIONS_URL)
         body.add_control("self", api.url_for(EventItem, id=id))
@@ -47,10 +56,8 @@ class EventItem(Resource):
         body.add_control_delete_event(id)
         body.add_control_edit_event(id)
         body.add_control_all_events()
-        print("success!")
         return Response(json.dumps(body), 200, mimetype=MASON)
-    
-        return 
+
     def put(self, handle):
         if not request.json:
             return create_error_response(415, "Unsupported media type",
@@ -77,12 +84,11 @@ class EventItem(Resource):
         except ValidationError as e:
             return create_error_response(400, "Invalid JSON document", str(e))
 
-        try:
-            db_event.id = event.id
-            db_event.name = event.name
-            db_event.place = event.place
-            db.session.commit()
-
+        
+        db_event.id = event.id
+        db_event.name = event.name
+        db_event.place = event.place
+        db.session.commit()
 
         return Response(status=204, headers={
             "Location": api.url_for(EventItem, id=request.json["id"])
