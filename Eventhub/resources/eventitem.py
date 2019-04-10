@@ -18,12 +18,17 @@ MASON = "application/vnd.mason+json"
 EVENT_PROFILE = "/profiles/EVENT/"
 
 class EventItem(Resource):
-    api = Api(current_app)
-    def get(self, id):
-    
-        db_event = Event.query.filter_by(id=id).first()
 
-        if db_event or db_event.creator is None:
+    def get(self, id):
+        api = Api(current_app)
+        db_event = Event.query.filter_by(id=id).first()
+        if db_event is None:
+            return create_event_error_response(404, "Not found",
+                                         "No event was found with the id {}".format(
+                                             id)
+                                         )
+        
+        if db_event.creator is None:
             return create_event_error_response(404, "Not found",
                                          "No event was found with the id {}".format(
                                              id)
@@ -38,10 +43,10 @@ class EventItem(Resource):
         )
         body.add_namespace("eventhub", LINK_RELATIONS_URL)
         body.add_control("self", api.url_for(EventItem, id=id))
-        body.add_control("profile", Event_PROFILE)
+        body.add_control("profile", EVENT_PROFILE)
         body.add_control_delete_event(id)
         body.add_control_edit_event(id)
-        body.add_control_all_event()
+        body.add_control_all_events()
         print("success!")
         return Response(json.dumps(body), 200, mimetype=MASON)
     
