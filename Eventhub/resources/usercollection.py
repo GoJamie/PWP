@@ -29,7 +29,13 @@ class UserCollection(Resource):
             users = User.query.all()
             body = InventoryBuilder(items=[])
             for j in users:
-                item = MasonBuilder(id=j.id, name=j.name, place=j.location, joined_events=j.joined_events)
+                events= []
+                for i in j.joined_events:
+                    event = {}
+                    event["id"]=i.id
+                    event["name"] = i.name
+                    events.append(event)
+                item = MasonBuilder(id=j.id, name=j.name, place=j.location, joined_events=events)
                 item.add_control("self", api.url_for(
                     UserItem, id=j.id))
                 item.add_control("profile", "/profiles/user/")

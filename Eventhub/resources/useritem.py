@@ -114,9 +114,8 @@ class UserItem(Resource):
 
 
         if user is None:
-            return create_error_response(404, "Doesn't exists",
-                                         "user with id '{}' doesn't exists.".format(
-                                             request.json["id"])
+            return create_event_error_response(404, "Doesn't exists",
+                                         "user with id '{}' doesn't exists.".format(id)
                                          )
 
 
@@ -129,5 +128,5 @@ class UserItem(Resource):
         db.session.commit()
     
         return Response(status=204, headers={
-            "Location": api.url_for(UserItem, id=request.json["id"])
+            "Location": api.url_for(UserItem, id=user.id)
         })

@@ -46,10 +46,10 @@ class User(db.Model):
 
 
 class LoginUser(db.Model):
-    id = db.Column(db.Integer, db.ForeignKey("user.id", ondelete='CASCADE'), primary_key=True)
+    id = db.Column(db.Integer, db.ForeignKey("user.id"), primary_key=True)
     username = db.Column(db.String(32), index=True, unique=True)
     password_hash = db.Column(db.String(128))
-    user = db.relationship("User", back_populates='loginuser', uselist=False)
+    user = db.relationship("User", back_populates='loginuser', uselist=False, cascade = "delete")
 
     def hash_password(self, password):
         self.password_hash = pwd_context.encrypt(password)
