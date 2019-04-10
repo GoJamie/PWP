@@ -29,13 +29,22 @@ class EventsByUser(Resource):
             
             events = Event.query.all()
             for j in events:
+                event = {}
+                event["id"] = j.id
+                event["name"] = j.name
+                event["creator_id"] = j.creator_id
+                event["place"] = j.place
+                event["time"] = j.time
+                event["description"] = j.description
+                users = []
                 joined_users = j.joined_users
                 for i in joined_users:
                     user = {}
                     user["id"] = i.id
                     user["name"] = i.name
-                    item = MasonBuilder(id=i.id,name=i.name)
-                    body["items"].append(item)
+                    users.append(user)
+                event["joined_users"] = users
+                body["items"].append(event)
             return Response(json.dumps(body), 200, mimetype=MASON)
         except (KeyError, ValueError):
             abort(400)
