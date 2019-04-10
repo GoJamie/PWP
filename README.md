@@ -5,16 +5,22 @@
 * Student 2. Nechir Salimi nechir123@hotmail.com
 * Student 3. Hao Ban s8125867@qq.com
 
-# Reqiurements
+# Requirements
+
 ```
 flask
 pytest
 passlib
 ```
 
-# Run Database Test
-* Go to root folder
-* In command line
-```
-pytest db_test.py
-```
+All dependencies can be installed using `pip install` command followed by the name of library, or alternatively execute this command in terminal to install all libraries needed:     
+`pip install -r requirements.txt`    
+
+# Database setup
+
+## Creating and populating the database
+
+## Testing Database
+
+## Running and testing the API
+
