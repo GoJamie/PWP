@@ -6,8 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, request, abort, Response, current_app
 from Eventhub import db
 from ..models import Event,LoginUser, User
-#from .eventcollection import EventCollection
-#from ..utils import InventoryBuilder, MasonBuilder, create_event_error_response
+from ..utils import InventoryBuilder, MasonBuilder, create_event_error_response
 import json
 from jsonschema import validate, ValidationError
 
@@ -23,8 +22,9 @@ class EventItem(Resource):
     def get(self, id):
     
         db_event = Event.query.filter_by(id=id).first()
-        if db_event is None:
-            return create_error_response(404, "Not found",
+
+        if db_event or db_event.creator is None:
+            return create_event_error_response(404, "Not found",
                                          "No event was found with the id {}".format(
                                              id)
                                          )
