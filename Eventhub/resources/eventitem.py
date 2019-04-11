@@ -58,9 +58,9 @@ class EventItem(Resource):
         body.add_control_all_events()
         return Response(json.dumps(body), 200, mimetype=MASON)
 
-    def put(self, handle):
+    def put(self, id):
         if not request.json:
-            return create_error_response(415, "Unsupported media type",
+            return create_event_error_response(415, "Unsupported media type",
                                          "Requests must be JSON"
                                          )
 
