@@ -49,7 +49,6 @@ class EventCollection(Resource):
             body.add_control_all_events()
             body.add_control_add_event()
             
-            
             return Response(json.dumps(body), 200, mimetype=MASON)
         except (KeyError, ValueError):
             abort(400)
