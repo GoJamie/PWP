@@ -153,6 +153,11 @@ class InventoryBuilder(MasonBuilder):
             "description": "picture of the user",
             "type": "string"
         }
+        
+        props["username"] = {
+            "description": "username of the user",
+            "type": "string"
+        }
         return schema
 
     def add_control_delete_event(self, id):
@@ -167,7 +172,7 @@ class InventoryBuilder(MasonBuilder):
 
     def add_control_all_events(self):
         self.add_control(
-            "eventshub:events-all",
+            "eventhub:events-all",
             "/api/events/",
             method="GET",
             title="get all events"
@@ -200,7 +205,7 @@ class InventoryBuilder(MasonBuilder):
         from .resources.useritem import UserItem
         api = Api(current_app)
         self.add_control(
-            "userhub:delete",
+            "eventhub:delete",
             href=api.url_for(UserItem, id=id),
             method="DELETE",
             title="Delete this user"
@@ -208,7 +213,7 @@ class InventoryBuilder(MasonBuilder):
 
     def add_control_all_users(self):
         self.add_control(
-            "events:users-all",
+            "eventhub:users-all",
             "/api/users/",
             method="GET",
             title="get all users"
@@ -217,7 +222,7 @@ class InventoryBuilder(MasonBuilder):
     def add_control_add_user(self):
 
         self.add_control(
-            "userhub:add-user",
+            "eventhub:add-user",
             "/api/users/",
             method="POST",
             encoding="json",
