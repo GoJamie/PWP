@@ -49,9 +49,13 @@ class EventsByUser(Resource):
                 users = []
                 joined_users = j.joined_users
                 for i in joined_users:
+                                
+                    db_loginuser = LoginUser.query.filter_by(id=i.id).first()
+
                     user = {}
                     user["id"] = i.id
                     user["name"] = i.name
+                    user["username"] = db_loginuser.username
                     users.append(user)
                 event_body["joined_users"] = users
                 event_body.add_namespace("eventhub", LINK_RELATIONS_URL)
