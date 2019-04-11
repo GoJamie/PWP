@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, request, abort, Response, current_app
 from Eventhub import db
 from ..models import Event,LoginUser, User
-from ..utils import InventoryBuilder, MasonBuilder, create_user_error_response
+from ..utils import InventoryBuilder, MasonBuilder, create_user_error_response, create_event_error_response
 import json
 from jsonschema import validate, ValidationError
 from .eventsbyuser import EventsByUser
@@ -26,10 +26,24 @@ class JoinEvent(Resource):
             return create_user_error_response(415, "Unsupported media type",
                                          "Requests must be JSON"
                                          )
+                                         
         event = Event.query.filter_by(id=event_id).first()
+        if event is None:
+            return create_event_error_response(404, "Not found",
+                                         "No event was found with the id {}".format(
+                                             event_id)
+                                         )
+
+        event = Event.query.filter_by(id=event_id).first()
+        for i in event.joined_users:
+            if i.id == int(user_id):
+                return create_user_error_response(409, "Already exists",
+                                            "user with id '{}' already exists.".format(
+                                                i.id)
+                                            )
         user = User.query.filter_by(id=user_id).first()
         if user is None:
-            return create_error_response(404, "Not found",
+            return create_user_error_response(404, "Not found",
                                          "No user was found with the id {}".format(
                                              id)
                                          )
@@ -38,9 +52,9 @@ class JoinEvent(Resource):
             event.joined_users.append(user)
             db.session.commit()
         except IntegrityError:
-            return create_error_response(409, "Already exists",
+            return create_user_error_response(409, "Already exists",
                                          "user with name '{}' already exists.".format(
-                                             request.json["handle"])
+                                             user.id)
                                          )
 
         return Response(status=204, headers={
