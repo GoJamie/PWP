@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, request, abort, Response, current_app
 from Eventhub import db
 from ..models import Event,LoginUser, User
-from ..utils import InventoryBuilder, MasonBuilder, create_event_error_response
+from ..utils import InventoryBuilder, MasonBuilder, create_user_error_response
 import json
 from jsonschema import validate, ValidationError
 
@@ -23,6 +23,8 @@ class UserItem(Resource):
     def get(self, id):
         api = Api(current_app)
         db_user = User.query.filter_by(id=id).first()
+        
+        db_loginuser = LoginUser.query.filter_by(id=id).first()
         events = Event.query.filter_by(creator_id=id).all()
         events_list = []
         for j in events:
@@ -35,7 +37,7 @@ class UserItem(Resource):
             events_list.append(item)
             
         if db_user is None:
-            return create_error_response(404, "Not found",
+            return create_user_error_response(404, "Not found",
                                          "No user was found with the id {}".format(
                                              id)
                                          )
@@ -44,6 +46,7 @@ class UserItem(Resource):
             id=db_user.id,
             name=db_user.name,
             location=db_user.location,
+            username = db_loginuser.username,
             Created_events =events_list
         )
         body.add_namespace("eventhub", LINK_RELATIONS_URL)
@@ -57,7 +60,7 @@ class UserItem(Resource):
 
     def put(self, id):
         if not request.json:
-            return create_error_response(415, "Unsupported media type",
+            return create_user_error_response(415, "Unsupported media type",
                                          "Requests must be JSON"
                                          )
 
@@ -70,7 +73,7 @@ class UserItem(Resource):
 
         db_user = User.query.filter_by(id=id).first()
         if db_user is None:
-            return create_error_response(404, "Not found",
+            return create_user_error_response(404, "Not found",
                                          "No product was found with the id {}".format(
                                              id)
                                          )
@@ -78,7 +81,7 @@ class UserItem(Resource):
         try:
             validate(request.json, InventoryBuilder.user_schema())
         except ValidationError as e:
-            return create_error_response(400, "Invalid JSON document", str(e))
+            return create_user_error_response(400, "Invalid JSON document", str(e))
 
         db_user.id = user.id
         db_user.name = user.name
@@ -107,7 +110,7 @@ class UserItem(Resource):
 
 
         if user is None:
-            return create_event_error_response(404, "Doesn't exists",
+            return create_user_error_response(404, "Doesn't exists",
                                          "user with id '{}' doesn't exists.".format(id)
                                          )
 

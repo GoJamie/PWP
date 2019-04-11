@@ -180,7 +180,7 @@ class InventoryBuilder(MasonBuilder):
             "/api/events/",
             method="POST",
             encoding="json",
-            title="Add a new product",
+            title="Add a new event",
             schema=self.event_schema()
         )
 
@@ -192,7 +192,7 @@ class InventoryBuilder(MasonBuilder):
             href=api.url_for(EventItem, id=id),
             method="Put",
             encoding="json",
-            title="Edit a product",
+            title="Edit a event",
             schema=self.event_schema()
         )
 
@@ -203,12 +203,12 @@ class InventoryBuilder(MasonBuilder):
             "userhub:delete",
             href=api.url_for(UserItem, id=id),
             method="DELETE",
-            title="Delete this resource"
+            title="Delete this user"
         )
 
     def add_control_all_users(self):
         self.add_control(
-            "usershub:events-all",
+            "events:users-all",
             "/api/users/",
             method="GET",
             title="get all users"
@@ -217,11 +217,11 @@ class InventoryBuilder(MasonBuilder):
     def add_control_add_user(self):
 
         self.add_control(
-            "userhub:add-event",
+            "userhub:add-user",
             "/api/users/",
             method="POST",
             encoding="json",
-            title="Add a new product",
+            title="Add a new user",
             schema=self.event_schema()
         )
 
@@ -235,6 +235,6 @@ class InventoryBuilder(MasonBuilder):
             href=api.url_for(UserItem, id=id),
             method="Put",
             encoding="json",
-            title="Edit a product",
+            title="Edit a user",
             schema=self.event_schema()
         )
