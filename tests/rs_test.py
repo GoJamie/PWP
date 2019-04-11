@@ -6,7 +6,15 @@ from jsonschema import validate
 from sqlalchemy.engine import Engine
 from sqlalchemy import event
 from sqlalchemy.exc import IntegrityError, StatementError
-from app import app,db, Event, User, LoginUser
+
+import sys
+import os
+
+o_path = os.getcwd()
+sys.path.append(o_path)
+
+from Eventhub import app, db
+from Eventhub.models import Event, User, LoginUser
 
 @pytest.fixture
 def client():
@@ -29,14 +37,14 @@ def _populate_db():
     """
     event = Event(
         name='PWP Meeting',
-        creator_id = 1
+        creator_id = 1,
         description="Test event"   
     )
     for i in range(1, 2):
         user = User(name='user-{}'.format(i))
         login_user = LoginUser(username='user-{}'.format(i))
         login_user.hash_password('password')
-        loginuser.user = user
+        login_user.user = user
         db.session.add(user)
         db.session.add(login_user)
         event.joined_users.append(user)
@@ -44,7 +52,7 @@ def _populate_db():
     user = User(name='user-{}'.format(3))
     login_user = LoginUser(username='user-{}'.format(3))
     login_user.hash_password('password')
-    loginuser.user = user
+    login_user.user = user
     db.session.add(user)
     db.session.add(login_user)
     event.creator = user
@@ -105,16 +113,13 @@ def _check_control_put_method(ctrl, client, obj, putType):
     ctrl_obj = obj["@controls"][ctrl]
     href = ctrl_obj["href"]
     method = ctrl_obj["method"].lower()
-    encoding = ctrl_obj["encoding"].lower()
     schema = ctrl_obj["schema"]
     assert method == "put"
-    assert encoding == "json"
     print(href)
-    body = _get_questionnaire_json()
-    if putType == "question":
-        body = _get_question_json()
-    elif putType == "answer":
-        body = _get_answer_json()
+    if putType == "event":
+        body = _get_event_json()
+    elif putType == "user":
+        body = _get_user_json()
     validate(body, schema)
     resp = client.put(href, json=body)
     assert resp.status_code == 204
@@ -123,15 +128,12 @@ def _check_control_post_method(ctrl, client, obj):
     ctrl_obj = obj["@controls"][ctrl]
     href = ctrl_obj["href"]
     method = ctrl_obj["method"].lower()
-    encoding = ctrl_obj["encoding"].lower()
     schema = ctrl_obj["schema"]
     assert method == "post"
-    assert encoding == "json"
-    body = _get_questionnaire_json()
-    if ctrl.endswith("question"):
-        body = _get_question_json()
-    elif ctrl.endswith("answer"):
-        body = _get_answer_json()
+    if ctrl.endswith("event"):
+        body = _get_event_json()
+    elif ctrl.endswith("user"):
+        body = _get_user_json()
     validate(body, schema)
     resp = client.post(href, json=body)
     assert resp.status_code == 201
@@ -172,7 +174,7 @@ class TestEventCollection(object):
         valid = _get_event_json(number=2)
 
         # test with valid and see that it exists afterward
-        resp = client.post(self.RESOURCE_URL, json=valid)
+        resp = client.post(self.RESOURCE_URL, data=valid)
         body = json.loads(client.get(self.RESOURCE_URL).data)
         id = body["items"][-1]["id"]
         assert resp.status_code == 201
@@ -189,7 +191,7 @@ class TestEventCollection(object):
 
         # remove title field for 400
         valid.pop("name")
-        resp = client.post(self.RESOURCE_URL, json=valid)
+        resp = client.post(self.RESOURCE_URL, data=valid)
         assert resp.status_code == 400
 
 class TestEventItem(object):
@@ -221,11 +223,11 @@ class TestEventItem(object):
         valid = _get_event_json(number=3)
 
         # test with valid
-        resp = client.put(self.RESOURCE_URL,json=valid)
+        resp = client.put(self.RESOURCE_URL,data=valid)
         assert resp.status_code == 204
 
         # test with another url
-        resp = client.put(self.INVALID_URL, json=valid)
+        resp = client.put(self.INVALID_URL, data=valid)
         assert resp.status_code == 404
 
         # test with wrong content type
@@ -280,53 +282,36 @@ class TestJoinEvent(object):
     RESOURCE_URL = "/api/users/1/events/1/"
     INVALID_URL = "/api/users/1/events/-1/"
 
-    def test_get(self,client):
-        """
-        Tests the GET method. Checks that the response status code is 200, and
-        then checks that all of the expected attributes and controls are
-        present, and the controls work. Also checks that all of the items from
-        the DB popluation are present, and their controls.
-        """
+    def test_put(self,client):
+        """Test for valid PUT method"""
+        valid = {"random":"random"}
+
+        # test with valid
+        resp = client.put(self.RESOURCE_URL,data=valid)
+        assert resp.status_code == 204
+
+        # test with another url
+        resp = client.put(self.INVALID_URL, data=valid)
+        assert resp.status_code == 404
+
+        # test with wrong content type
+        resp = client.put(self.RESOURCE_URL, data=json.dumps(valid))
+        assert resp.status_code == 415
+
+        # remove field title for 400
+        resp = client.put(self.RESOURCE_URL,json=valid)
+        assert resp.status_code == 405
+
+        valid = {
+	    "username":"user-{}".format(4),
+        "name": "user",
+        "password":"password"
+        }
+        resp = client.put(self.RESOURCE_URL, json=valid)
         resp = client.get(self.RESOURCE_URL)
         assert resp.status_code == 200
         body = json.loads(resp.data)
-        _check_namespace(client, body)
-        _check_control_post_method("survey:add-answer", client, body)
-        assert len(body["items"]) == 1
-        for item in body["items"]:
-            _check_control_get_method("self", client, item)
-            _check_control_get_method("profile", client, item)
-            assert "content" in item
-            assert "userName" in item
-
-    def test_post(self, client): 
-        valid = _get_answer_json()
-
-        # test with wrong content type
-        resp = client.post(self.RESOURCE_URL, data=json.dumps(valid))
-        assert resp.status_code == 415
-
-        # test with valid and see that it exists afterward
-        resp = client.post(self.RESOURCE_URL, json=valid)
-        body = json.loads(client.get(self.RESOURCE_URL).data)
-        id = body["items"][-1]["id"]
-        assert resp.status_code == 201
-        assert resp.headers["Location"].endswith(self.RESOURCE_URL + str(id) + "/")
-        resp = client.get(resp.headers["Location"])
-        assert resp.status_code == 200
-        body = json.loads(resp.data)
-        assert body["content"] == "test-answer-content"
-        assert body["userName"] == "test-user-1"
-
-        # test with invalid url
-        resp = client.post(self.INVALID_URL, json=valid)
-        assert resp.status_code == 405
-
-        # remove field title for 400
-        valid = _get_answer_json()
-        valid.pop("userName")
-        resp = client.post(self.RESOURCE_URL, json=valid)
-        assert resp.status_code == 400
+        assert body["name"] == valid["name"] and body["username"] == valid["username"]
 
     def test_delete(self, client):
 
@@ -372,7 +357,7 @@ class TestUserCollection(object):
         valid = _get_user_json(number=2)
 
         # test with valid and see that it exists afterward
-        resp = client.post(self.RESOURCE_URL, json=valid)
+        resp = client.post(self.RESOURCE_URL, data=valid)
         body = json.loads(client.get(self.RESOURCE_URL).data)
         id = body["items"][-1]["id"]
         assert resp.status_code == 201
@@ -423,11 +408,11 @@ class TestUserItem(object):
         valid = _get_user_json(number=3)
 
         # test with valid
-        resp = client.put(self.RESOURCE_URL,json=valid)
+        resp = client.put(self.RESOURCE_URL,data=valid)
         assert resp.status_code == 204
 
         # test with another url
-        resp = client.put(self.INVALID_URL, json=valid)
+        resp = client.put(self.INVALID_URL, data=valid)
         assert resp.status_code == 404
 
         # test with wrong content type
@@ -436,7 +421,7 @@ class TestUserItem(object):
 
         # remove field title for 400
         valid.pop("name")
-        resp = client.post(self.RESOURCE_URL, json=valid)
+        resp = client.post(self.RESOURCE_URL, data=valid)
         assert resp.status_code == 405
 
         valid = {

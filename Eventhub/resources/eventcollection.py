@@ -42,10 +42,10 @@ class EventCollection(Resource):
                         user = {}
                         user["id"] = i.id
                         user["name"] = i.name
-                        joined_users.push(joined_users)
+                        joined_users.append(user)
                         
                     item = MasonBuilder(
-                        id=j.id, name=j.name, description=j.description, place=j.place, time=j.time,creator=creator_user, joined_users=j.joined_users)
+                        id=j.id, name=j.name, description=j.description, place=j.place, time=j.time,creator=creator_user, joined_users=joined_users)
                     item.add_control("self", api.url_for(
                         EventItem, id=j.id))
                     item.add_control("profile", "/profiles/event/")
@@ -54,7 +54,6 @@ class EventCollection(Resource):
             body.add_namespace("eventhub", LINK_RELATIONS_URL)
             body.add_control_all_events()
             body.add_control_add_event()
-            
             
             return Response(json.dumps(body), 200, mimetype=MASON)
         except (KeyError, ValueError):
