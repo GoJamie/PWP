@@ -32,14 +32,20 @@ class EventCollection(Resource):
             for j in events:
                 if(j.creator != None):
                         
-                    user = {}
+                    creator_user = {}
 
-                    user["id"] = j.creator.id
+                    creator_user["id"] = j.creator.id
                     
-                    user["name"] = j.creator.name
-
+                    creator_user["name"] = j.creator.name
+                    joined_users = []
+                    for i in j.joined_users:
+                        user = {}
+                        user["id"] = i.id
+                        user["name"] = i.name
+                        joined_users.push(joined_users)
+                        
                     item = MasonBuilder(
-                        id=j.id, name=j.name, description=j.description, place=j.place, time=j.time,creator=user, joined_users=j.joined_users)
+                        id=j.id, name=j.name, description=j.description, place=j.place, time=j.time,creator=creator_user, joined_users=j.joined_users)
                     item.add_control("self", api.url_for(
                         EventItem, id=j.id))
                     item.add_control("profile", "/profiles/event/")
