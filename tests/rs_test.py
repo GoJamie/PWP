@@ -78,19 +78,19 @@ def _check_control_delete_method(ctrl, client, obj):
 
 def _get_event_json(number=1):
     return {
-                    "name":"event-{}".format(number),
-                    "description": "test",
-                    "place": "ousadalu",
-                    "time":"28012119",
-                    "creatorId": 1
-}
+                "name":"event-{}".format(number),
+                "description": "test",
+                "place": "ousadalu",
+                "time":"28012119",
+                "creatorId": 1
+            }
 
 def _get_user_json(number=1):
     return {
-	"username":"user-{}".format(number),
-    "name": "test user",
-    "password":"password"
-}
+                "username":"user-{}".format(number),
+                "name": "test user",
+                "password":"password"
+            }
 
 def _check_control_put_method(ctrl, client, obj, putType):
     """
@@ -245,56 +245,40 @@ class TestEventItem(object):
         assert body["name"] == valid["name"] and body["description"] == valid["description"]
 
 class TestEventsbyUser(object):
-    RESOURCE_URL = "/api/questionnaires/1/questions/"
-    INVALID_URL = "/api/questionnaires/-1/questions/"
+    RESOURCE_URL = "/api/users/1/events/"
+    INVALID_URL = "/api/users/-1/events/"
 
     def test_get(self,client):
         """Tests for questions by questionnaire GET method."""
         resp = client.get(self.RESOURCE_URL)
         assert resp.status_code == 200
         body = json.loads(resp.data)
+        assert body["username"] == "user-1"
+        assert body["name"] == "test user"
         _check_namespace(client, body)
-        _check_control_post_method("survey:add-question", client, body)
-        assert len(body["items"]) == 2
-        for item in body["items"]:
-            print(item)
-            _check_control_get_method("self", client, item)
-            _check_control_get_method("profile", client, item)
-            assert "title" in item
-            assert "description" in item
-
-    def test_post(self, client): 
-        valid = _get_question_json()
-
-        # test with wrong content type
-        resp = client.post(self.RESOURCE_URL, data=json.dumps(valid))
-        assert resp.status_code == 415
-
-        # test with valid and see that it exists afterward
-        resp = client.post(self.RESOURCE_URL, json=valid)
-        body = json.loads(client.get(self.RESOURCE_URL).data)
-        id = body["items"][-1]["id"]
-        assert resp.status_code == 201
-        assert resp.headers["Location"].endswith(self.RESOURCE_URL + str(id) + "/")
-        resp = client.get(resp.headers["Location"])
+        _check_control_get_method("self", client, body)
+        _check_control_get_method("profile", client, body)
+        _check_control_get_method("eventhub:users-all", client, body)
+        _check_control_put_method("edit", client, body,"user")
+        _check_control_delete_method("eventhub:delete", client, body)
+        resp = client.get(self.INVALID_URL)
+        assert resp.status_code == 404
+ 
         assert resp.status_code == 200
         body = json.loads(resp.data)
-        assert body["title"] == "test-question-1"
-        assert body["description"] == "test-question"
-
-        # test with invalid url
-        resp = client.post(self.INVALID_URL, json=valid)
-        assert resp.status_code == 404
-
-        # remove field title for 400
-        valid = _get_question_json()
-        valid.pop("title")
-        resp = client.post(self.RESOURCE_URL, json=valid)
-        assert resp.status_code == 400
-
+        _check_namespace(client, body)
+        for item in body["items"]:
+            assert item["name"] == "event-1"
+            assert item["description"] == "test"
+            _check_namespace(client, item)
+            _check_control_get_method("profile", client, item)
+            _check_control_get_method("eventshub:events-all", client, item)
+            _check_control_put_method("edit", client, item,"event")
+            _check_control_delete_method("eventhub:delete", client, item)
+ 
 class TestJoinEvent(object):
-    RESOURCE_URL = "/api/questionnaires/1/questions/1/answers/"
-    INVALID_URL = "/api/questionnaires/1/questions/-1/answers/"
+    RESOURCE_URL = "/api/users/1/events/1/"
+    INVALID_URL = "/api/users/1/events/-1/"
 
     def test_get(self,client):
         """
@@ -343,6 +327,15 @@ class TestJoinEvent(object):
         valid.pop("userName")
         resp = client.post(self.RESOURCE_URL, json=valid)
         assert resp.status_code == 400
+
+    def test_delete(self, client):
+
+        resp = client.delete(self.RESOURCE_URL)
+        assert resp.status_code == 204
+        resp = client.get(self.RESOURCE_URL)
+        assert resp.status_code == 404
+        resp = client.delete(self.INVALID_URL)
+        assert resp.status_code == 404
 
 class TestUserCollection(object):
     """
@@ -414,7 +407,8 @@ class TestUserItem(object):
         resp = client.get(self.RESOURCE_URL)
         assert resp.status_code == 200
         body = json.loads(resp.data)
-        assert body["name"] == "user-1"
+        assert body["username"] == "user-1"
+        assert body["name"] == "test user"
         _check_namespace(client, body)
         _check_control_get_method("self", client, body)
         _check_control_get_method("profile", client, body)
@@ -445,9 +439,22 @@ class TestUserItem(object):
         resp = client.post(self.RESOURCE_URL, json=valid)
         assert resp.status_code == 405
 
-        valid = _get_event_json(number=4)
+        valid = {
+	    "username":"user-{}".format(4),
+        "name": "user",
+        "password":"password"
+        }
         resp = client.put(self.RESOURCE_URL, json=valid)
         resp = client.get(self.RESOURCE_URL)
         assert resp.status_code == 200
         body = json.loads(resp.data)
-        assert body["name"] == valid["name"] and body["description"] == valid["description"]
+        assert body["name"] == valid["name"] and body["username"] == valid["username"]
+
+    def test_delete(self, client):
+
+        resp = client.delete(self.RESOURCE_URL)
+        assert resp.status_code == 204
+        resp = client.get(self.RESOURCE_URL)
+        assert resp.status_code == 404
+        resp = client.delete(self.INVALID_URL)
+        assert resp.status_code == 404
