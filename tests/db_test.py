@@ -7,8 +7,14 @@ from sqlalchemy.engine import Engine
 from sqlalchemy import event
 from sqlalchemy.exc import IntegrityError, StatementError
 
-import database
-from database import Event, User, LoginUser
+import sys
+import os
+
+o_path = os.getcwd()
+sys.path.append(o_path)
+
+from Eventhub import app, db
+from Eventhub.models import Event, User, LoginUser
 
 @event.listens_for(Engine, "connect")
 def set_sqlite_pragma(dbapi_connection, connection_record):
@@ -19,27 +25,27 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
 @pytest.fixture
 def db_handle():
     db_fd, db_fname = tempfile.mkstemp()
-    database.app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + db_fname
-    database.app.config["TESTING"] = True
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + db_fname
+    app.config["TESTING"] = True
     
-    with database.app.app_context():
-        database.db.create_all()
+    with app.app_context():
+        db.create_all()
         
-    yield database.db
+    yield db
     
     os.close(db_fd)
     os.unlink(db_fname)
 
 def _get_event():
     return Event(
+        id='1',
         name='PWP Meeting',
-        history=False,
         description="Test event"
     )
 
 def _get_user():
     return User(
-        name='Bangju Wang',
+        name='Bangju Wang1',
     )
     
 def _get_loginuser(number=1):
@@ -146,7 +152,6 @@ def test_event_columns(db_handle):
     db_handle.session.rollback()
 
     event = _get_event()
-    event.history = None
     db_handle.session.add(event)
     with pytest.raises(IntegrityError):
         db_handle.session.commit()
