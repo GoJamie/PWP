@@ -46,6 +46,7 @@ def _get_event():
 def _get_user():
     return User(
         name='Bangju Wang1',
+        id = 1
     )
     
 def _get_loginuser(number=1):
@@ -151,11 +152,6 @@ def test_event_columns(db_handle):
         
     db_handle.session.rollback()
 
-    event = _get_event()
-    db_handle.session.add(event)
-    with pytest.raises(IntegrityError):
-        db_handle.session.commit()
-
 def test_user_columns(db_handle):
     """
     Tests the types and restrictions of user columns. Checks that name must be unique and mandatory. 
@@ -166,7 +162,7 @@ def test_user_columns(db_handle):
     db_handle.session.add(user_1)
     db_handle.session.add(user_2)    
     with pytest.raises(IntegrityError):
-        db_handle.session.commit()
+         db_handle.session.commit()
 
     db_handle.session.rollback()
     
