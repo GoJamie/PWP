@@ -55,23 +55,17 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
     cursor.execute("PRAGMA foreign_keys=ON")
     cursor.close()
 from .resources.eventcollection import EventCollection
-
 from .resources.eventitem import EventItem
-
 from .resources.usercollection import UserCollection
-
 from .resources.useritem import UserItem
-
-
 from .resources.eventsbyuser import EventsByUser
 from .resources.joinevent import JoinEvent
 
 api = Api(app)
-
+#     Add resource path
 api.add_resource(EventCollection, "/api/events/")
 api.add_resource(UserCollection, "/api/users/")
 api.add_resource(EventItem, "/api/events/<id>/")
 api.add_resource(UserItem, "/api/users/<id>/")
 api.add_resource(EventsByUser, "/api/users/<user_id>/events/")
-
 api.add_resource(JoinEvent, "/api/users/<user_id>/events/<event_id>/")

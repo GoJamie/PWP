@@ -91,7 +91,7 @@ class EventCollection(Resource):
 
         except IntegrityError:
             return create_event_error_response(409, "Already exists",
-                                               "Product with handle '{}' already exists.".format(event.id)
+                                               "Event with id '{}' already exists.".format(event.id)
                                                )
     
         return Response(status=201, headers={

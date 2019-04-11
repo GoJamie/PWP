@@ -30,7 +30,7 @@ class JoinEvent(Resource):
         user = User.query.filter_by(id=user_id).first()
         if user is None:
             return create_error_response(404, "Not found",
-                                         "No product was found with the id {}".format(
+                                         "No user was found with the id {}".format(
                                              id)
                                          )
 
