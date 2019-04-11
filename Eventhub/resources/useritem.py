@@ -63,6 +63,10 @@ class UserItem(Resource):
             return create_user_error_response(415, "Unsupported media type",
                                          "Requests must be JSON"
                                          )
+        try:
+            validate(request.json, InventoryBuilder.user_schema())
+        except ValidationError as e:
+            return create_user_error_response(400, "Invalid JSON document", str(e))
 
         user = User(
             id=request.json["id"],
@@ -78,10 +82,6 @@ class UserItem(Resource):
                                              id)
                                          )
 
-        try:
-            validate(request.json, InventoryBuilder.user_schema())
-        except ValidationError as e:
-            return create_user_error_response(400, "Invalid JSON document", str(e))
 
         db_user.id = user.id
         db_user.name = user.name

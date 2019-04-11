@@ -70,13 +70,13 @@ class JoinEvent(Resource):
 
 
         if user is None:
-            return create_error_response(404, "Doesn't exists",
+            return create_user_error_response(404, "Doesn't exists",
                                          "user with id '{}' doesn't exist.".format(
                                              user_id)
                                          )
 
         if event is None:
-            return create_error_response(404, "Doesn't exists",
+            return create_event_error_response(404, "Doesn't exists",
                                          "event with id '{}' doesn't exist.".format(
                                              event_id)
                                          )

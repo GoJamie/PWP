@@ -61,6 +61,19 @@ from .resources.useritem import UserItem
 from .resources.eventsbyuser import EventsByUser
 from .resources.joinevent import JoinEvent
 
+@app.route("/profiles/<resource>/")
+def send_profile_html(resource):
+    return "Random string"
+    # return send_from_directory(app.static_folder, "{}.html".format(resource))
+
+
+@app.route("/eventhub/link-relations/")
+def send_link_relations_html():
+    return "some string"
+    # return send_from_directory(app.static_folder, "links-relations.html")
+
+
+
 api = Api(app)
 #     Add resource path
 api.add_resource(EventCollection, "/api/events/")

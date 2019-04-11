@@ -155,7 +155,7 @@ class TestEventCollection(object):
         resp = client.get(self.RESOURCE_URL)
         assert resp.status_code == 200
         body = json.loads(resp.data)
-        #_check_namespace(client, body)
+        _check_namespace(client, body)
         #_check_control_post_method("eventhub:add-event", client, body)
         assert len(body["items"]) == 1
         for item in body["items"]:
@@ -174,10 +174,13 @@ class TestEventCollection(object):
         valid = _get_event_json(number=2)
 
         # test with valid and see that it exists afterward
-        resp = client.post(self.RESOURCE_URL, data=valid)
+        data=json.dumps(valid)
+        
+        resp = client.post(self.RESOURCE_URL, json=valid)
         body = json.loads(client.get(self.RESOURCE_URL).data)
         id = body["items"][-1]["id"]
-        #assert resp.status_code == 201
+        assert resp.status_code == 201
+        print(resp)
         assert resp.headers["Location"].endswith(self.RESOURCE_URL + str(id) + "/")
         resp = client.get(resp.headers["Location"])
         assert resp.status_code == 200
@@ -191,7 +194,7 @@ class TestEventCollection(object):
 
         # remove title field for 400
         valid.pop("name")
-        resp = client.post(self.RESOURCE_URL, data=valid)
+        resp = client.post(self.RESOURCE_URL, json=valid)
         assert resp.status_code == 400
 
 class TestEventItem(object):
@@ -223,11 +226,11 @@ class TestEventItem(object):
         valid = _get_event_json(number=3)
 
         # test with valid
-        resp = client.put(self.RESOURCE_URL,data=valid)
+        resp = client.put(self.RESOURCE_URL,json=valid)
         #assert resp.status_code == 204
 
         # test with another url
-        resp = client.put(self.INVALID_URL, data=valid)
+        resp = client.put(self.INVALID_URL, json=valid)
         assert resp.status_code == 404
 
         # test with wrong content type
@@ -267,7 +270,7 @@ class TestEventsbyUser(object):
         _check_control_get_method("self", client, body)
         _check_control_get_method("profile", client, body)
         _check_control_get_method("eventhub:users-all", client, body)
-        _check_control_put_method("edit", client, body,"user")
+        _check_control_put_method("edit", client, body,"event")
         _check_control_delete_method("eventhub:delete", client, body)
         resp = client.get(self.INVALID_URL)
         assert resp.status_code == 404
@@ -293,11 +296,11 @@ class TestJoinEvent(object):
         valid = {"random":"random"}
 
         # test with valid
-        resp = client.put(self.RESOURCE_URL,data=valid)
+        resp = client.put(self.RESOURCE_URL,json=valid)
         #assert resp.status_code == 204
 
         # test with another url
-        resp = client.put(self.INVALID_URL, data=valid)
+        resp = client.put(self.INVALID_URL, json=valid)
         assert resp.status_code == 404
 
         # test with wrong content type
@@ -363,7 +366,7 @@ class TestUserCollection(object):
         valid = _get_user_json(number=2)
 
         # test with valid and see that it exists afterward
-        resp = client.post(self.RESOURCE_URL, data=valid)
+        resp = client.post(self.RESOURCE_URL, json=valid)
         body = json.loads(client.get(self.RESOURCE_URL).data)
         id = body["items"][-1]["id"]
         #assert resp.status_code == 201
@@ -404,7 +407,7 @@ class TestUserItem(object):
         _check_control_get_method("self", client, body)
         _check_control_get_method("profile", client, body)
         _check_control_get_method("eventhub:users-all", client, body)
-        _check_control_put_method("edit", client, body,"user")
+        _check_control_put_method("edit", client, body,"event")
         _check_control_delete_method("eventhub:delete", client, body)
         resp = client.get(self.INVALID_URL)
         assert resp.status_code == 404
@@ -414,11 +417,11 @@ class TestUserItem(object):
         valid = _get_user_json(number=3)
 
         # test with valid
-        resp = client.put(self.RESOURCE_URL,data=valid)
+        resp = client.put(self.RESOURCE_URL,json=valid)
         #assert resp.status_code == 204
 
         # test with another url
-        resp = client.put(self.INVALID_URL, data=valid)
+        resp = client.put(self.INVALID_URL, json=valid)
         assert resp.status_code == 404
 
         # test with wrong content type
@@ -427,7 +430,7 @@ class TestUserItem(object):
 
         # remove field title for 400
         valid.pop("name")
-        resp = client.post(self.RESOURCE_URL, data=valid)
+        resp = client.post(self.RESOURCE_URL, json=valid)
         assert resp.status_code == 405
 
         valid = {
