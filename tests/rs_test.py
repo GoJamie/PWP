@@ -174,7 +174,7 @@ class TestEventCollection(object):
         valid = _get_event_json(number=2)
 
         # test with valid and see that it exists afterward
-        resp = client.post(self.RESOURCE_URL, json=valid)
+        resp = client.post(self.RESOURCE_URL, data=valid)
         body = json.loads(client.get(self.RESOURCE_URL).data)
         id = body["items"][-1]["id"]
         assert resp.status_code == 201
@@ -191,7 +191,7 @@ class TestEventCollection(object):
 
         # remove title field for 400
         valid.pop("name")
-        resp = client.post(self.RESOURCE_URL, json=valid)
+        resp = client.post(self.RESOURCE_URL, data=valid)
         assert resp.status_code == 400
 
 class TestEventItem(object):
@@ -223,11 +223,11 @@ class TestEventItem(object):
         valid = _get_event_json(number=3)
 
         # test with valid
-        resp = client.put(self.RESOURCE_URL,json=valid)
+        resp = client.put(self.RESOURCE_URL,data=valid)
         assert resp.status_code == 204
 
         # test with another url
-        resp = client.put(self.INVALID_URL, json=valid)
+        resp = client.put(self.INVALID_URL, data=valid)
         assert resp.status_code == 404
 
         # test with wrong content type
@@ -287,11 +287,11 @@ class TestJoinEvent(object):
         valid = {"random":"random"}
 
         # test with valid
-        resp = client.put(self.RESOURCE_URL,json=valid)
+        resp = client.put(self.RESOURCE_URL,data=valid)
         assert resp.status_code == 204
 
         # test with another url
-        resp = client.put(self.INVALID_URL, json=valid)
+        resp = client.put(self.INVALID_URL, data=valid)
         assert resp.status_code == 404
 
         # test with wrong content type
@@ -357,7 +357,7 @@ class TestUserCollection(object):
         valid = _get_user_json(number=2)
 
         # test with valid and see that it exists afterward
-        resp = client.post(self.RESOURCE_URL, json=valid)
+        resp = client.post(self.RESOURCE_URL, data=valid)
         body = json.loads(client.get(self.RESOURCE_URL).data)
         id = body["items"][-1]["id"]
         assert resp.status_code == 201
@@ -408,11 +408,11 @@ class TestUserItem(object):
         valid = _get_user_json(number=3)
 
         # test with valid
-        resp = client.put(self.RESOURCE_URL,json=valid)
+        resp = client.put(self.RESOURCE_URL,data=valid)
         assert resp.status_code == 204
 
         # test with another url
-        resp = client.put(self.INVALID_URL, json=valid)
+        resp = client.put(self.INVALID_URL, data=valid)
         assert resp.status_code == 404
 
         # test with wrong content type
@@ -421,7 +421,7 @@ class TestUserItem(object):
 
         # remove field title for 400
         valid.pop("name")
-        resp = client.post(self.RESOURCE_URL, json=valid)
+        resp = client.post(self.RESOURCE_URL, data=valid)
         assert resp.status_code == 405
 
         valid = {
