@@ -133,7 +133,7 @@ class InventoryBuilder(MasonBuilder):
     def user_schema():
         schema = {
             "type": "object",
-            "required": ["name", "id"]
+            "required": ["name"]
         }
         props = schema["properties"] = {}
         props["id"] = {

@@ -23,6 +23,7 @@ class UserItem(Resource):
     def get(self, id):
         api = Api(current_app)
         db_user = User.query.filter_by(id=id).first()
+        print(db_user)
         
         db_loginuser = LoginUser.query.filter_by(id=id).first()
         events = Event.query.filter_by(creator_id=id).all()
@@ -69,7 +70,6 @@ class UserItem(Resource):
             return create_user_error_response(400, "Invalid JSON document", str(e))
 
         user = User(
-            id=request.json["id"],
             name=request.json["name"],
             location=request.json["location"],
 
