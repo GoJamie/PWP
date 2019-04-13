@@ -90,6 +90,8 @@ class EventItem(Resource):
         db_event.id = event.id
         db_event.name = event.name
         db_event.place = event.place
+        
+        db_event.description = event.description
         db.session.commit()
 
         return Response(status=204, headers={

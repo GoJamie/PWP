@@ -78,7 +78,7 @@ class UserCollection(Resource):
         
             users = User.query.all()
 
-            user.id = len(users) + 1
+            user.id = len(users)
 
 
         except IntegrityError:

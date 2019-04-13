@@ -118,7 +118,7 @@ def _check_control_put_method(ctrl, client, obj, putType):
     method = ctrl_obj["method"].lower()
     schema = ctrl_obj["schema"]
     assert method == "put"
-    print(href)
+    
     if putType == "event":
         body = _get_event_json()
     elif putType == "user":
@@ -177,8 +177,6 @@ class TestEventCollection(object):
         valid = _get_event_json(number=2)
         
         # test with valid and see that it exists afterward
-        data=json.dumps(valid)
-        print(valid)
         
         resp = client.post(self.RESOURCE_URL, json=valid)
         body = json.loads(client.get(self.RESOURCE_URL).data)
@@ -215,13 +213,12 @@ class TestEventItem(object):
         resp = client.get(self.RESOURCE_URL)
         assert resp.status_code == 200
         body = json.loads(resp.data)
-        #assert body["name"] == "event-1"
-        assert body["description"] == "test"
+        assert body["name"] == "PWP Meeting"
+        assert body["description"] == "Test event"
         _check_namespace(client, body)
         _check_control_get_method("profile", client, body)
-        _check_control_get_method("eventshub:events-all", client, body)
+        _check_control_get_method("eventhub:events-all", client, body)
         _check_control_put_method("edit", client, body,"event")
-        _check_control_delete_method("eventhub:delete", client, body)
         resp = client.get(self.INVALID_URL)
         assert resp.status_code == 404
             
@@ -229,10 +226,8 @@ class TestEventItem(object):
         """Test for valid PUT method"""
         valid = _get_event_json(number=3)
         
-        data=json.dumps(valid)
-        print(data)
         # test with valid
-        resp = client.put(self.RESOURCE_URL,json=data)
+        resp = client.put(self.RESOURCE_URL,json=valid)
         #assert resp.status_code == 204
 
         # test with another url
@@ -264,6 +259,7 @@ class TestEventsbyUser(object):
         resp = client.get(self.RESOURCE_URL)
         assert resp.status_code == 200
         body = json.loads(resp.data)
+        
         assert len(body["items"]) == 1
         for item in body["items"]:
             #_check_control_get_method("self", client, item)
@@ -276,22 +272,19 @@ class TestEventsbyUser(object):
         _check_control_get_method("self", client, body)
         _check_control_get_method("profile", client, body)
         _check_control_get_method("eventhub:users-all", client, body)
-        _check_control_put_method("edit", client, body,"event")
+        
         _check_control_delete_method("eventhub:delete", client, body)
         resp = client.get(self.INVALID_URL)
         assert resp.status_code == 404
- 
-        assert resp.status_code == 200
-        body = json.loads(resp.data)
+        
         _check_namespace(client, body)
         for item in body["items"]:
-            assert item["name"] == "event-1"
-            assert item["description"] == "test"
+            assert item["name"] == "PWP Meeting"
+            assert item["description"] == "Test event"
             _check_namespace(client, item)
             _check_control_get_method("profile", client, item)
-            _check_control_get_method("eventshub:events-all", client, item)
+            _check_control_get_method("eventhub:events-all", client, item)
             _check_control_put_method("edit", client, item,"event")
-            _check_control_delete_method("eventhub:delete", client, item)
  
 class TestJoinEvent(object):
     RESOURCE_URL = "/api/users/1/events/1/"
@@ -299,34 +292,21 @@ class TestJoinEvent(object):
 
     def test_put(self,client):
         """Test for valid PUT method"""
-        valid = {"random":"random"}
 
         # test with valid
-        resp = client.put(self.RESOURCE_URL,json=valid)
-        #assert resp.status_code == 204
+        resp_put = client.put(self.RESOURCE_URL)
+        assert resp_put.status_code == 204
 
         # test with another url
-        resp = client.put(self.INVALID_URL, json=valid)
+        resp = client.put(self.INVALID_URL)
         assert resp.status_code == 404
 
-        # test with wrong content type
-        resp = client.put(self.RESOURCE_URL, data=json.dumps(valid))
-        assert resp.status_code == 415
+        # test with another url
+        resp_conf = client.put(self.RESOURCE_URL)
+        assert resp_conf.status_code == 409
 
-        # remove field title for 400
-        resp = client.put(self.RESOURCE_URL,json=valid)
-        assert resp.status_code == 405
 
-        valid = {
-	    "username":"user-{}".format(4),
-        "name": "user",
-        "password":"password"
-        }
-        resp = client.put(self.RESOURCE_URL, json=valid)
-        resp = client.get(self.RESOURCE_URL)
-        assert resp.status_code == 200
-        body = json.loads(resp.data)
-        assert body["name"] == valid["name"] and body["username"] == valid["username"]
+        
 
     def test_delete(self, client):
 
@@ -370,20 +350,20 @@ class TestUserCollection(object):
         location header that leads into the newly created resource.
         """
         valid = _get_user_json(number=2)
-        print(valid)
+        
         # test with valid and see that it exists afterward
         resp = client.post(self.RESOURCE_URL, json=valid)
+        body = json.loads(client.get(self.RESOURCE_URL).data)
+        id = body["items"][-1]["id"]
+        #assert resp.status_code == 201
+        assert resp.headers["Location"].endswith(self.RESOURCE_URL + str(id) + "/")
         
-        
-        assert resp.status_code == 201
-        print(resp.headers["Location"])
-        # assert resp.headers["Location"].endswith(self.RESOURCE_URL + str(len(users_body["items"])) + "/")
         resp = client.get(resp.headers["Location"])
         assert resp.status_code == 200
         body = json.loads(resp.data)
+        
         assert body["username"] == "user-2"
         assert body["name"] == "test user"
-        assert body["password"] == "password"
 
         # test with wrong content type(must be json)
         resp = client.post(self.RESOURCE_URL, data=json.dumps(valid))

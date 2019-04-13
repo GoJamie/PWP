@@ -93,6 +93,10 @@ class EventCollection(Resource):
             db.session.add(event)
             db.session.commit()
             print(api.url_for(EventItem, id=event.id))
+                
+            events = Event.query.all()
+            
+            event.id = len(events)
 
         except IntegrityError:
             return create_event_error_response(409, "Already exists",

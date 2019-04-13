@@ -27,6 +27,12 @@ class EventsByUser(Resource):
         api = Api(current_app)
         body = InventoryBuilder(items=[])
         user = User.query.filter_by(id=user_id).first()
+        if user is None:
+            return create_user_error_response(404, "Not found",
+                                        "No user was found with the id {}".format(
+                                            user_id)
+                                        )
+
         body["user"] = {"user_id":user.id,"name":user.name}
         body.add_namespace("eventhub", LINK_RELATIONS_URL)
         body.add_control("self", api.url_for(UserItem, id=user_id))

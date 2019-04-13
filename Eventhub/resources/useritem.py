@@ -21,7 +21,10 @@ class UserItem(Resource):
     api = Api(current_app)
 
     def get(self, id):
+        print(id)
+        id = int(id)
         api = Api(current_app)
+        User.query.all()
         db_user = User.query.filter_by(id=id).first()
         print(db_user)
         
@@ -71,7 +74,7 @@ class UserItem(Resource):
 
         user = User(
             name=request.json["name"],
-            location=request.json["location"],
+            location=request.json["location"]
 
         )
 

@@ -22,11 +22,6 @@ class JoinEvent(Resource):
 
     def put(self, user_id, event_id):
         api = Api(current_app)
-        if not request.json:
-            return create_user_error_response(415, "Unsupported media type",
-                                         "Requests must be JSON"
-                                         )
-                                         
         event = Event.query.filter_by(id=event_id).first()
         if event is None:
             return create_event_error_response(404, "Not found",
