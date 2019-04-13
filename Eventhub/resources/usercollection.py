@@ -62,13 +62,10 @@ class UserCollection(Resource):
         
         loginuser = LoginUser(username=request.json['username'])
         loginuser.hash_password(request.json['password'])
-        user = User(name=request.json['name'])
+        user = User(name=request.json['name'], location=request.json["location"])
 
         loginuser.user = user
 
-        users = User.query.all()
-
-        user.id = len(users) + 1
 
         try:
 
@@ -77,6 +74,11 @@ class UserCollection(Resource):
             db.session.add(user)
             db.session.add(loginuser)
             db.session.commit()
+        
+        
+            users = User.query.all()
+
+            user.id = len(users) + 1
 
 
         except IntegrityError:
