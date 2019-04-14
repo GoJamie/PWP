@@ -45,7 +45,7 @@ class UserItem(Resource):
                                          "No user was found with the id {}".format(
                                              id)
                                          )
-
+                                        
         body = InventoryBuilder(
             id=db_user.id,
             name=db_user.name,
@@ -63,6 +63,8 @@ class UserItem(Resource):
 
 
     def put(self, id):
+            
+        api = Api(current_app)
         if not request.json:
             return create_user_error_response(415, "Unsupported media type",
                                          "Requests must be JSON"
@@ -86,13 +88,13 @@ class UserItem(Resource):
                                          )
 
 
-        db_user.id = user.id
+        db_user.id = id
         db_user.name = user.name
         db_user.location = user.location
         db.session.commit()
 
         return Response(status=204, headers={
-            "Location": api.url_for(UserItem, id=request.json["id"])
+            "Location": api.url_for(UserItem, id=id)
         })
 
     def delete(self, id):

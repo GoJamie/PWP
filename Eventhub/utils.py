@@ -241,5 +241,5 @@ class InventoryBuilder(MasonBuilder):
             method="Put",
             encoding="json",
             title="Edit a user",
-            schema=self.event_schema()
+            schema=self.user_schema()
         )

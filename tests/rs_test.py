@@ -34,7 +34,7 @@ def client():
 
 def _populate_db():
     """
-    Pre-populate database with 1 event, 3 users and 3 loginusers.
+    Pre-populate database with 1 event, 2 users and 2 loginusers.
     """
     event = Event(
         name='PWP Meeting',
@@ -124,6 +124,7 @@ def _check_control_put_method(ctrl, client, obj, putType):
     elif putType == "user":
         body = _get_user_json()
     validate(body, schema)
+    print(body)
     resp = client.put(href, json=body)
     assert resp.status_code == 204
 
@@ -292,9 +293,11 @@ class TestJoinEvent(object):
 
     def test_put(self,client):
         """Test for valid PUT method"""
+        user = _get_user_json(5)
+        resp_post = client.post("/api/users/", json=user)
+        resp_put = client.put("/api/users/3/events/1/")
 
         # test with valid
-        resp_put = client.put(self.RESOURCE_URL)
         assert resp_put.status_code == 204
 
         # test with another url
@@ -374,72 +377,71 @@ class TestUserCollection(object):
         resp = client.post(self.RESOURCE_URL, json=valid)
         assert resp.status_code == 400
 
-#  class TestUserItem(object):
-#     RESOURCE_URL = "/api/users/1/"
-#     INVALID_URL = "/api/users/-1/"
+class TestUserItem(object):
+    RESOURCE_URL = "/api/users/1/"
+    INVALID_URL = "/api/users/-1/"
 
-#     def test_get(self,client):
-#         """
-#         Tests the GET method. Checks that the response status code is 200, and
-#         then checks that all of the expected attributes and controls are
-#         present, and the controls work. Also checks that all of the items from
-#         the DB popluation are present, and their controls.
-#         """
-#         resp = client.get(self.RESOURCE_URL)
-#         assert resp.status_code == 200
-#         body = json.loads(resp.data)
-#         print(body)
-#         assert body["username"] == 'user-1'
-#         assert body["name"] == "user-1"
-#         _check_namespace(client, body)
-#         _check_control_get_method("self", client, body)
-#         _check_control_get_method("profile", client, body)
-#         _check_control_get_method("eventhub:users-all", client, body)
-#         _check_control_put_method("edit", client, body,"event")
-#         _check_control_delete_method("eventhub:delete", client, body)
-#         resp = client.get(self.INVALID_URL)
-#         assert resp.status_code == 404
+    def test_get(self,client):
+        """
+        Tests the GET method. Checks that the response status code is 200, and
+        then checks that all of the expected attributes and controls are
+        present, and the controls work. Also checks that all of the items from
+        the DB popluation are present, and their controls.
+        """
+        resp = client.get(self.RESOURCE_URL)
+        assert resp.status_code == 200
+        body = json.loads(resp.data)
+        assert body["username"] == 'user-1'
+        assert body["name"] == "user-1"
+        body["name"] = "asdasdas"
+        _check_namespace(client, body)
+        _check_control_get_method("self", client, body)
+        _check_control_get_method("profile", client, body)
+        _check_control_get_method("eventhub:users-all", client, body)
+        _check_control_put_method("edit", client, body,"user")
+        _check_control_delete_method("eventhub:delete", client, body)
+        resp = client.get(self.INVALID_URL)
+        assert resp.status_code == 404
             
-#     def test_put(self,client):
-#         """Test for valid PUT method"""
-#         valid = _get_user_json(number=4)
+    def test_put(self,client):
+        """Test for valid PUT method"""
+        valid = _get_user_json(number=1)
         
-#         # test with valid
+        # test with valid
        
-#         data=json.dumps(valid)
         
-#         resp = client.put(self.RESOURCE_URL,json=valid)
-#         assert resp.status_code == 204
+        resp = client.put(self.RESOURCE_URL,json=valid)
+        assert resp.status_code == 204
 
-#         # test with another url
-#         resp = client.put(self.INVALID_URL, json=valid)
-#         assert resp.status_code == 404
+        # test with another url
+        resp = client.put(self.INVALID_URL, json=valid)
+        assert resp.status_code == 404
 
-#         # test with wrong content type
-#         resp = client.put(self.RESOURCE_URL, data=json.dumps(valid))
-#         assert resp.status_code == 415
+        # test with wrong content type
+        resp = client.put(self.RESOURCE_URL, data=json.dumps(valid))
+        assert resp.status_code == 415
 
-#         # remove field title for 400
-#         valid.pop("name")
-#         resp = client.post(self.RESOURCE_URL, json=valid)
-#         assert resp.status_code == 405
+        # remove field title for 400
+        valid.pop("name")
+        resp = client.post(self.RESOURCE_URL, json=valid)
+        assert resp.status_code == 405
 
         
-#         data=json.dumps(valid)
-#         print(data)
-#         resp = client.put(self.RESOURCE_URL, json=data)
-#         print(resp)
-#         resp = client.get(self.RESOURCE_URL)
-#         assert resp.status_code == 200
-#         body = json.loads(resp.data)
-#         print(body)
-#         assert body["name"] == valid["name"] and body["username"] == valid["username"]
+        
+        valid["name"] = "ggs"
+        resp_put = client.put(self.RESOURCE_URL, json=valid)
+        
+        resp = client.get(self.RESOURCE_URL)
+        assert resp.status_code == 200
+        body = json.loads(resp.data)
+        print(body)
+        assert body["name"] == valid["name"] and body["username"] == valid["username"]
 
-#     def test_delete(self, client):
+    def test_delete(self, client):
 
-#         resp = client.delete(self.RESOURCE_URL)
-#         assert resp.status_code == 204
-#         resp = client.get(self.RESOURCE_URL)
-#         assert resp.status_code == 404
-#         resp = client.delete(self.INVALID_URL)
-#         assert resp.status_code == 404
+        resp = client.delete(self.RESOURCE_URL)
+        assert resp.status_code == 204
+        resp = client.get(self.RESOURCE_URL)
+        assert resp.status_code == 404
+        resp = client.delete(self.INVALID_URL)
+        assert resp.status_code == 404
