@@ -11,8 +11,7 @@ This project requires `flask`, `pysqlite3`, `flask-sqlalchemy`, `flask-restful`,
 
 For testing, `pytest` is need to do database_test and resource_test.
 
-All dependencies can be installed using `pip install` command followed by the name of library, or alternatively execute this command in terminal to install all libraries needed:     
-`pip install -r requirements.txt`    
+All dependencies can be installed using `pip install` command followed by the name of library.    
 
 # Database setup
 
