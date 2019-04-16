@@ -21,8 +21,13 @@ ERROR_PROFILE = "/profiles/error/"
 
 
 class UserCollection(Resource):
-
+    """
+    Resource class for representing all users
+    """
     def get(self):
+        """
+        Return information of all users (returns a Mason document) if found otherwise returns 404
+        """
         api = Api(current_app)
 
         try:
@@ -50,6 +55,13 @@ class UserCollection(Resource):
             abort(400)
 
     def post(self):
+    """
+    post information for new user
+    Parameters:
+        - username: String, username of user
+        - name: String, name of user
+        - password: String, password of user
+    """
         api = Api(current_app)
         if not request.json:
             return create_user_error_response(415, "Unsupported media type",

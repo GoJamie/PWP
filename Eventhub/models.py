@@ -19,6 +19,19 @@ users = db.Table("joinedusers",
                            "event.id"), primary_key=True)
                  )
 
+"""
+Table Event
+----------------------
+Columns:
+- id, INTEGER, PRIMARY KEY
+- name, STRING, 
+- description, STRING
+- place, STRING
+- time, DATATIME
+- creator, RELATIONSHIP with User
+- creator_id, INTEGER
+- joined_users, RELATIONSHIP with User
+"""
 
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -31,6 +44,18 @@ class Event(db.Model):
     joined_users = db.relationship(
         "User", secondary=users, back_populates="joined_events")
 
+"""
+Table User
+----------------------
+Columns:
+- id, INTEGER, PRIMARY KEY
+- picture, STRING
+- name, STRING, 
+- location, STRING
+- events, RELATIONSHIP with Event
+- loginuser, RELATIONSHIP with LoginUser
+- joined_events, RELATIONSHIP with Event
+"""
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -45,6 +70,15 @@ class User(db.Model):
 # model for logining in, going go hash the password with hash_password methods and also verify the password with verify_password
 
 
+"""
+Table LoginUser
+----------------------
+Columns:
+- id, INTEGER, PRIMARY KEY, Foreingnkey of User.id
+- username, STRING
+- password_hash, STRING, 
+- user, RELATIONSHIP with User
+"""
 class LoginUser(db.Model):
     id = db.Column(db.Integer, db.ForeignKey("user.id"), primary_key=True)
     username = db.Column(db.String(32), index=True, unique=True)

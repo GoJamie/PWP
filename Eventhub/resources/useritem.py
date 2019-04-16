@@ -17,10 +17,17 @@ EVENT_PROFILE = "/profiles/EVENT/"
 
 
 class UserItem(Resource):
-
+    """
+    Resource class for representing particular user
+    """
     api = Api(current_app)
 
     def get(self, id):
+    """
+    get specific information for particular user
+    Parameters:
+        - id: Integer, id of user
+    """
         print(id)
         id = int(id)
         api = Api(current_app)
@@ -63,7 +70,11 @@ class UserItem(Resource):
 
 
     def put(self, id):
-            
+    """
+    modify specific information for particular user
+    Parameters:
+        - id: Integer, id of user
+    """
         api = Api(current_app)
         if not request.json:
             return create_user_error_response(415, "Unsupported media type",
@@ -98,6 +109,11 @@ class UserItem(Resource):
         })
 
     def delete(self, id):
+    """
+    delete specific information for particular user
+    Parameters:
+        - id: Integer, id of user
+    """
         '''
         user = User(
             id=request.json["id"]

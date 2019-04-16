@@ -18,8 +18,15 @@ MASON = "application/vnd.mason+json"
 EVENT_PROFILE = "/profiles/EVENT/"
 
 class EventItem(Resource):
-
+    """
+    Resource class for representing particular event
+    """
     def get(self, id):
+    """
+    get specific information for particular event 
+    Parameters:
+        - id: Integer, id of event
+    """
         api = Api(current_app)
         db_event = Event.query.filter_by(id=id).first()
         if db_event is None:
@@ -59,7 +66,11 @@ class EventItem(Resource):
         return Response(json.dumps(body), 200, mimetype=MASON)
 
     def put(self, id):
-        
+    """
+    modify specific information for particular event 
+    Parameters:
+        - id: Integer, id of event
+    """
         api = Api(current_app)
         if not request.json:
             return create_event_error_response(415, "Unsupported media type",

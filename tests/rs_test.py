@@ -16,9 +16,16 @@ sys.path.append(o_path)
 
 from Eventhub import app, db
 from Eventhub.models import Event, User, LoginUser
+                """In this function, we test 6 resourses and 12 methods."""
+
 
 @pytest.fixture
 def client():
+    """
+    This function setup a new app for testing using test configuration. It is decorated with @pytest.fixture
+    so it will run in every test that has this function's name as parameter
+    This function is adapted from Exercise 1: Testing flask app part and Exercise 3 Project layout part.
+    """
     db_fd, db_fname = tempfile.mkstemp()
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + db_fname
     app.config["TESTING"] = True
@@ -65,20 +72,30 @@ def _populate_db():
 
 def _check_namespace(client, response):
     """
-    Check the "eventhub" namespace.
+    Check the "eventhub" namespace from response body
+    This function is adapted from example in exercise 3 testing part.
     """
     ns_href = response["@namespaces"]["eventhub"]["name"]
     resp = client.get(ns_href)
     assert resp.status_code == 200
 
 def _check_control_get_method(ctrl, client, obj):
-
+    """
+    Checks a GET type control from a JSON object be it root document or an item
+    in a collection. Also checks that the URL of the control can be accessed.
+    This function is adapted from example in exercise 3 testing part.
+    """
     href = obj["@controls"][ctrl]["href"]
     resp = client.get(href)
     assert resp.status_code == 200
 
 def _check_control_delete_method(ctrl, client, obj):
-
+    """
+    Checks a DELETE type control from a JSON object be it root document or an
+    item in a collection. Checks the contrl's method in addition to its "href".
+    Also checks that using the control results in the correct status code of 204.
+    This function is adapted from example in exercise 3 testing part.
+    """
     href = obj["@controls"][ctrl]["href"]
     method = obj["@controls"][ctrl]["method"].lower()
     assert method == "delete"
@@ -86,6 +103,9 @@ def _check_control_delete_method(ctrl, client, obj):
     assert resp.status_code == 204
 
 def _get_event_json(number=1):
+    """
+    Generate valid json document for PUT and POST test of Event resource
+    """
     return {
                 
                 "name":"event-{}".format(number),
@@ -96,6 +116,9 @@ def _get_event_json(number=1):
             }
 
 def _get_user_json(number=1):
+    """
+    Generate valid json document for PUT and POST test of User resource
+    """
     return {
                 "username":"user-{}".format(number),
                 "name": "test user",
@@ -129,6 +152,15 @@ def _check_control_put_method(ctrl, client, obj, putType):
     assert resp.status_code == 204
 
 def _check_control_post_method(ctrl, client, obj):
+    """
+    Checks a POST type control from a JSON object be it root document or an item
+    in a collection. In addition to checking the "href" attribute, also checks
+    that method, encoding and schema can be found from the control. Also
+    validates a valid sensor against the schema of the control to ensure that
+    they match. Finally checks that using the control results in the correct
+    status code of 201.
+    This function is adapted from example in exercise 3 testing part.
+    """
     ctrl_obj = obj["@controls"][ctrl]
     href = ctrl_obj["href"]
     method = ctrl_obj["method"].lower()
@@ -312,7 +344,7 @@ class TestJoinEvent(object):
         
 
     def test_delete(self, client):
-
+        """Test for valid DELETE method""" 
         resp = client.delete(self.RESOURCE_URL)
         assert resp.status_code == 204
         resp = client.get(self.RESOURCE_URL)
@@ -438,7 +470,7 @@ class TestUserItem(object):
         assert body["name"] == valid["name"] and body["username"] == valid["username"]
 
     def test_delete(self, client):
-
+        """Test for valid DELETE method""" 
         resp = client.delete(self.RESOURCE_URL)
         assert resp.status_code == 204
         resp = client.get(self.RESOURCE_URL)
