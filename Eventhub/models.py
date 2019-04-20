@@ -2,7 +2,8 @@ import math
 import os
 import json
 from flask import Flask, request, abort, jsonify, url_for
-from passlib.apps import custom_app_context as pwd_context
+
+from passlib.hash import pbkdf2_sha256 as sha256
 
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
@@ -82,14 +83,16 @@ Columns:
 class LoginUser(db.Model):
     id = db.Column(db.Integer, db.ForeignKey("user.id"), primary_key=True)
     username = db.Column(db.String(32), index=True, unique=True)
-    password_hash = db.Column(db.String(128))
+    password_hash = db.Column(db.String(120), nullable = False)
     user = db.relationship("User", back_populates='loginuser', uselist=False, cascade = "delete")
 
-    def hash_password(self, password):
-        self.password_hash = pwd_context.encrypt(password)
-
-    def verify_password(self, password):
-        return pwd_context.verify(password, self.password_hash)
+    @staticmethod
+    def generate_hash(password):
+        return sha256.hash(password)
+    
+    @staticmethod
+    def verify_hash(password, hash):
+        return sha256.verify(password, hash)
 
 
 # @app.route('/api/users/', methods=['POST'])

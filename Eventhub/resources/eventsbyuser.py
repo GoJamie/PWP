@@ -26,11 +26,11 @@ class EventsByUser(Resource):
     Resource class for representing all events for particular user
     """
     def get(self, user_id):
-    """
-    get all events information for particular user 
-    Parameters:
-        - id: Integer, id of event
-    """
+    # """
+    # get all events information for particular user 
+    # Parameters:
+    #     - id: Integer, id of event
+    # """
         api = Api(current_app)
         body = InventoryBuilder(items=[])
         user = User.query.filter_by(id=user_id).first()

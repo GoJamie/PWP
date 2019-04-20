@@ -23,12 +23,12 @@ class JoinEvent(Resource):
     Resource class for representing user who wants to modify the status of event
     """
     def put(self, user_id, event_id):
-    """
-    modify the information of joining event 
-    Parameters:
-        - user_id: Integer, id of user
-        - event_id: Integer, id of event
-    """    
+    # """
+    # modify the information of joining event 
+    # Parameters:
+    #     - user_id: Integer, id of user
+    #     - event_id: Integer, id of event
+    # """    
         api = Api(current_app)
         event = Event.query.filter_by(id=event_id).first()
         if event is None:
@@ -65,12 +65,12 @@ class JoinEvent(Resource):
         })
 
     def delete(self, user_id, event_id):
-    """
-    Delete the information of joined event 
-    Parameters:
-        - user_id: Integer, id of user
-        - event_id: Integer, id of event
-    """  
+    # """
+    # Delete the information of joined event 
+    # Parameters:
+    #     - user_id: Integer, id of user
+    #     - event_id: Integer, id of event
+    # """  
         api = Api(current_app)
 
         event = Event.query.filter_by(id=event_id).first()

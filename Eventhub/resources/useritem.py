@@ -1,10 +1,12 @@
-from flask_restful import Resource, Api
+from flask_restful import Resource, Api, reqparse
+
+from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
 
 from sqlalchemy.exc import IntegrityError
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask, request, abort, Response, current_app
 from Eventhub import db
-from ..models import Event,LoginUser, User
+from ..models import Event,LoginUser, User, LoginUser
 from ..utils import InventoryBuilder, MasonBuilder, create_user_error_response
 import json
 from jsonschema import validate, ValidationError
@@ -16,6 +18,7 @@ MASON = "application/vnd.mason+json"
 EVENT_PROFILE = "/profiles/EVENT/"
 
 
+
 class UserItem(Resource):
     """
     Resource class for representing particular user
@@ -23,11 +26,11 @@ class UserItem(Resource):
     api = Api(current_app)
 
     def get(self, id):
-    """
-    get specific information for particular user
-    Parameters:
-        - id: Integer, id of user
-    """
+    # """
+    # get specific information for particular user
+    # Parameters:
+    #     - id: Integer, id of user
+    # """
         print(id)
         id = int(id)
         api = Api(current_app)
@@ -70,11 +73,11 @@ class UserItem(Resource):
 
 
     def put(self, id):
-    """
-    modify specific information for particular user
-    Parameters:
-        - id: Integer, id of user
-    """
+    # """
+    # modify specific information for particular user
+    # Parameters:
+    #     - id: Integer, id of user
+    # """
         api = Api(current_app)
         if not request.json:
             return create_user_error_response(415, "Unsupported media type",
@@ -109,23 +112,23 @@ class UserItem(Resource):
         })
 
     def delete(self, id):
-    """
-    delete specific information for particular user
-    Parameters:
-        - id: Integer, id of user
-    """
-        '''
-        user = User(
-            id=request.json["id"]
-        )
+    # """
+    # delete specific information for particular user
+    # Parameters:
+    #     - id: Integer, id of user
+    # """
+    #     '''
+    #     user = User(
+    #         id=request.json["id"]
+    #     )
         
-        loginUser = LoginUser(
-            id=request.json["id"]
-        )
+    #     loginUser = LoginUser(
+    #         id=request.json["id"]
+    #     )
 
-        db_user = User.query.filter_by(id=id).first()
-        loginUser = LoginUser.query.filter_by(id=id).first()
-        '''
+    #     db_user = User.query.filter_by(id=id).first()
+    #     loginUser = LoginUser.query.filter_by(id=id).first()
+    #     '''
         api = Api(current_app)
         user=db.session.query(LoginUser).get(id)
 
@@ -147,3 +150,33 @@ class UserItem(Resource):
         return Response(status=204, headers={
             "Location": api.url_for(UserItem, id=user.id)
         })
+
+
+parser = reqparse.RequestParser()
+parser.add_argument('username', help = 'This field cannot be blank', required = True)
+parser.add_argument('password', help = 'This field cannot be blank', required = True)
+
+
+
+class UserLogin(Resource):
+    def post(self):
+        
+        data = parser.parse_args()
+        
+        
+        current_user = LoginUser.query.filter_by(username=data['username']).first()
+        print(current_user.password_hash)
+
+        if not current_user:
+            return {'message': 'User {} doesn\'t exist'.format(data['username'])}
+        
+        if LoginUser.verify_hash(data['password'], current_user.password_hash):
+            access_token = create_access_token(identity = data['username'])
+            return {
+                'message': 'Logged in as {}'.format(current_user.username),
+                'access_token': access_token
+                }
+        else:
+            return {'message': 'Wrong credentials'}
+
+

@@ -5,6 +5,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Api
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
+
+from flask_jwt_extended import JWTManager
 db = SQLAlchemy()
 
 # Based on http://flask.pocoo.org/docs/1.0/tutorial/factory/#the-application-factory
@@ -20,6 +22,8 @@ def create_app(test_config=None):
         DATABASE=os.path.join(app.instance_path, 'Eventhub.sqlite'),
     )
         
+    app.config['SECRET_KEY'] = 'we the best'    
+    app.config['JWT_SECRET_KEY'] = 'jwt-secret-string'
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///test.db"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db = SQLAlchemy(app)
@@ -48,6 +52,7 @@ app.app_context().push()
 db.init_app(app)
 
 db = SQLAlchemy(app)
+jwt = JWTManager(app)
 
 @event.listens_for(Engine, "connect")
 def set_sqlite_pragma(dbapi_connection, connection_record):
@@ -59,7 +64,7 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
 from .resources.eventcollection import EventCollection
 from .resources.eventitem import EventItem
 from .resources.usercollection import UserCollection
-from .resources.useritem import UserItem
+from .resources.useritem import UserItem, UserLogin
 from .resources.eventsbyuser import EventsByUser
 from .resources.joinevent import JoinEvent
 
@@ -84,3 +89,4 @@ api.add_resource(EventItem, "/api/events/<id>/")
 api.add_resource(UserItem, "/api/users/<id>/")
 api.add_resource(EventsByUser, "/api/users/<user_id>/events/")
 api.add_resource(JoinEvent, "/api/users/<user_id>/events/<event_id>/")
+api.add_resource(UserLogin, '/api/login/')

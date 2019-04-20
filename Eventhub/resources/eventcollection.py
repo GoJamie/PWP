@@ -65,14 +65,14 @@ class EventCollection(Resource):
             abort(400)
 
     def post(self):
-    """
-    post information for new event 
-    Parameters:
-        - name: String, name of event
-        - description: String, description of event
-        - place: String, place of event
-        - creator_id: Integer, creator's id of event
-    """
+    # """
+    # post information for new event 
+    # Parameters:
+    #     - name: String, name of event
+    #     - description: String, description of event
+    #     - place: String, place of event
+    #     - creator_id: Integer, creator's id of event
+    # """
         api = Api(current_app)
         if not request.json:
             return create_event_error_response(415, "Unsupported media type",

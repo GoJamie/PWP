@@ -1,5 +1,6 @@
 from flask_restful import Resource, Api
 
+from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
 
 from sqlalchemy.exc import IntegrityError
 from flask_sqlalchemy import SQLAlchemy
@@ -24,6 +25,7 @@ class UserCollection(Resource):
     """
     Resource class for representing all users
     """
+    @jwt_required
     def get(self):
         """
         Return information of all users (returns a Mason document) if found otherwise returns 404
@@ -55,13 +57,13 @@ class UserCollection(Resource):
             abort(400)
 
     def post(self):
-    """
-    post information for new user
-    Parameters:
-        - username: String, username of user
-        - name: String, name of user
-        - password: String, password of user
-    """
+    # """
+    # post information for new user
+    # Parameters:
+    #     - username: String, username of user
+    #     - name: String, name of user
+    #     - password: String, password of user
+    # """
         api = Api(current_app)
         if not request.json:
             return create_user_error_response(415, "Unsupported media type",
@@ -73,7 +75,7 @@ class UserCollection(Resource):
             return create_user_error_response(400, "Invalid JSON document", str(e))
         
         loginuser = LoginUser(username=request.json['username'])
-        loginuser.hash_password(request.json['password'])
+        loginuser.password_hash = loginuser.generate_hash(request.json['password'])
         user = User(name=request.json['name'], location=request.json["location"])
 
         loginuser.user = user
