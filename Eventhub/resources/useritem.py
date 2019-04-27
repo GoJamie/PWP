@@ -160,10 +160,11 @@ parser.add_argument('password', help = 'This field cannot be blank', required = 
 
 class UserLogin(Resource):
     def post(self):
-        
+        print(request.json)
         data = parser.parse_args()
         
         
+    
         current_user = LoginUser.query.filter_by(username=data['username']).first()
         print(current_user.password_hash)
 

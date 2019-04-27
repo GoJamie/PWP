@@ -20,9 +20,12 @@ export default class Navbars extends Component {
     super(props);
 
     this.toggle = this.toggle.bind(this);
+    this.login = this.login.bind(this);
+
     this.state = {
       isOpen: false,
-      login: false
+      login: false,
+      logged: false
     };
   }
   toggle() {
@@ -36,13 +39,36 @@ export default class Navbars extends Component {
       login: !this.state.isOpen
     });
   }
+  login() {
+    this.setState({
+      logged: true
+    });
+  }
   render() {
+    console.log(localStorage.getItem('message'));
+
     return (
       <div>
         <Navbar color="light" light expand="md">
           <NavbarBrand href="/">Event</NavbarBrand>
           <Nav className="ml-auto" navbar>
-            <LoginModal />
+            {this.state.logged ? (
+              <div>
+                <h3>{localStorage.getItem('message')}</h3>
+                <button
+                  onClick={() => {
+                    localStorage.removeItem('token');
+                    this.setState({
+                      logged: false
+                    });
+                  }}
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <LoginModal login={this.login} />
+            )}
           </Nav>
         </Navbar>
       </div>

@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Api
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
-
+from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 db = SQLAlchemy()
 
@@ -46,6 +46,7 @@ def create_app(test_config=None):
 
 
 app = create_app()
+CORS(app)
 
 app.app_context().push()
 
@@ -89,4 +90,4 @@ api.add_resource(EventItem, "/api/events/<id>/")
 api.add_resource(UserItem, "/api/users/<id>/")
 api.add_resource(EventsByUser, "/api/users/<user_id>/events/")
 api.add_resource(JoinEvent, "/api/users/<user_id>/events/<event_id>/")
-api.add_resource(UserLogin, '/api/login/')
+api.add_resource(UserLogin, '/api/login')

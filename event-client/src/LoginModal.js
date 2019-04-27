@@ -32,6 +32,31 @@ class LoginModal extends Component {
     }
   }
   onLogin() {
+    const log = {
+      username: this.state.username,
+      password: this.state.password
+    };
+    console.log(JSON.stringify(log));
+    const request = async () => {
+      const response2 = await fetch('http://localhost:5000/api/login', {
+        method: 'POST',
+        mode: 'cors',
+        body: JSON.stringify(log), // data can be `string` or {object}!
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const json2 = await response2.json();
+      return json2;
+    };
+    request().then(data => {
+      console.log(data);
+      localStorage.setItem('token', data.access_token);
+
+      localStorage.setItem('message', data.message);
+      this.props.login();
+    });
     this.toggle();
   }
 
