@@ -26,10 +26,22 @@ class EventCollection(Resource):
     """
     def get(self):
         """
-        Return information of all events (returns a Mason document) if found otherwise returns 404
+        # get information as follows
+        # Information:
+        #     - id: Integer, id of event
+        #     - name: String, name of event
+        #     - description: String, description of event
+        #     - place: String, place of event
+        #     - time: DataTime, time of event
+        #     - creator_id: Integer, creator's id of event
+        #     - join_users: users_id, Integer, id of user
+        #                   users_name, String, name of user
+        # Response:
+        #     - 400: Found something else and get KeyError and ValueError
+        #     - 200: Return information of all events (returns a Mason document)
         """
         api = Api(current_app)
-
+        
         try:
             events = Event.query.all()
             body = InventoryBuilder(items=[])
@@ -59,26 +71,32 @@ class EventCollection(Resource):
             body.add_namespace("eventhub", LINK_RELATIONS_URL)
             body.add_control_all_events()
             body.add_control_add_event()
-            
+
             return Response(json.dumps(body), 200, mimetype=MASON)
         except (KeyError, ValueError):
             abort(400)
 
     def post(self):
-    # """
+    """
     # post information for new event 
     # Parameters:
     #     - name: String, name of event
     #     - description: String, description of event
     #     - place: String, place of event
     #     - creator_id: Integer, creator's id of event
-    # """
+    # Response:
+    #     - 415: create_event_error_response and alert "unsupported media type and Requests must be JSON"
+    #     - 400: create_event_error_response and alert "Invalid JSON document" 
+    #     - 409: create_event_error_response and alert "Already exists Event with id '{}' already exists."
+    #     - 201: success
+    """
         api = Api(current_app)
         if not request.json:
             return create_event_error_response(415, "Unsupported media type",
                                                "Requests must be JSON"
                                                )
 
+        
         try:
             validate(request.json, InventoryBuilder.event_schema())
         except ValidationError as e:
