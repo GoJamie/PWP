@@ -88,7 +88,7 @@ class EventCollection(Resource):
     #     - 415: create_event_error_response and alert "unsupported media type and Requests must be JSON"
     #     - 400: create_event_error_response and alert "Invalid JSON document" 
     #     - 409: create_event_error_response and alert "Already exists Event with id '{}' already exists."
-    #     - 201: success
+    #     - 201: success to post
     """
         api = Api(current_app)
         if not request.json:

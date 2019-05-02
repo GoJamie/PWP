@@ -28,7 +28,7 @@ class EventItem(Resource):
     #     - id: Integer, id of event
     # Response:
     #     - 404: create_event_error_response and alert "Not found No event was found with the id {}"
-    #     - 200: success
+    #     - 200: Return information of the event (returns a Mason document)
     # Information:
     #     - name: String, name of event
     #     - description: String, description of event
@@ -89,7 +89,7 @@ class EventItem(Resource):
     #     - 415: create_event_error_response and alert "Unsupported media type Requests must be JSON"
     #     - 404: create_event_error_response and alert "Not found No event was found with the id {}"
     #     - 400: create_event_error_response and alert "Invalid JSON document"
-    #     - 204: success
+    #     - 204: success to edit
     """
         api = Api(current_app)
         if not request.json:
