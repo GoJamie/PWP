@@ -47,12 +47,16 @@ export default class Navbars extends Component {
   render() {
     console.log(localStorage.getItem('message'));
 
+    console.log(localStorage.getItem('token'));
     return (
       <div>
         <Navbar color="light" light expand="md">
           <NavbarBrand href="/">Event</NavbarBrand>
           <Nav className="ml-auto" navbar>
-            {this.state.logged ? (
+            <NavItem>
+              <NavLink href="/api/events/">Events</NavLink>
+            </NavItem>
+            {this.state.logged || localStorage.getItem('token') !== null ? (
               <div>
                 <h3>{localStorage.getItem('message')}</h3>
                 <button
