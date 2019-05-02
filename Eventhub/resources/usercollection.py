@@ -25,7 +25,8 @@ class UserCollection(Resource):
     """
     Resource class for representing all users
     """
-    @jwt_required
+    #used for 
+    #@jwt_required
     def get(self):
         """
         Return information of all users (returns a Mason document) if found otherwise returns 404
@@ -64,6 +65,7 @@ class UserCollection(Resource):
     #     - name: String, name of user
     #     - password: String, password of user
     # """
+    
         api = Api(current_app)
         if not request.json:
             return create_user_error_response(415, "Unsupported media type",

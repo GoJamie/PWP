@@ -16,7 +16,7 @@ sys.path.append(o_path)
 
 from Eventhub import app, db
 from Eventhub.models import Event, User, LoginUser
-                """In this function, we test 6 resourses and 12 methods."""
+"""In this function, we test 6 resourses and 12 methods."""
 
 
 @pytest.fixture
@@ -51,7 +51,8 @@ def _populate_db():
     for i in range(1, 2):
         user = User(name='user-{}'.format(i))
         login_user = LoginUser(username='user-{}'.format(i))
-        login_user.hash_password('password')
+        
+        login_user.password_hash = login_user.generate_hash('password')
         login_user.user = user
         db.session.add(user)
         db.session.add(login_user)
@@ -59,7 +60,7 @@ def _populate_db():
 
     user = User(name='user-{}'.format(3))
     login_user = LoginUser(username='user-{}'.format(3))
-    login_user.hash_password('password')
+    login_user.password_hash = login_user.generate_hash('password')
     login_user.user = user
     db.session.add(user)
     db.session.add(login_user)
