@@ -77,19 +77,19 @@ class EventCollection(Resource):
             abort(400)
 
     def post(self):
-    """
-    # post information for new event 
-    # Parameters:
-    #     - name: String, name of event
-    #     - description: String, description of event
-    #     - place: String, place of event
-    #     - creator_id: Integer, creator's id of event
-    # Response:
-    #     - 415: create_event_error_response and alert "unsupported media type and Requests must be JSON"
-    #     - 400: create_event_error_response and alert "Invalid JSON document" 
-    #     - 409: create_event_error_response and alert "Already exists Event with id '{}' already exists."
-    #     - 201: success to post
-    """
+        """
+        # post information for new event 
+        # Parameters:
+        #     - name: String, name of event
+        #     - description: String, description of event
+        #     - place: String, place of event
+        #     - creator_id: Integer, creator's id of event
+        # Response:
+        #     - 415: create_event_error_response and alert "unsupported media type and Requests must be JSON"
+        #     - 400: create_event_error_response and alert "Invalid JSON document" 
+        #     - 409: create_event_error_response and alert "Already exists Event with id '{}' already exists."
+        #     - 201: success to post
+        """
         api = Api(current_app)
         if not request.json:
             return create_event_error_response(415, "Unsupported media type",

@@ -23,18 +23,18 @@ class JoinEvent(Resource):
     Resource class for representing user who wants to modify the status of event
     """
     def put(self, user_id, event_id):
-    """
-    # modify the information of joining event 
-    # Parameters:
-    #     - user_id: Integer, id of user
-    #     - event_id: Integer, id of event
-    # Response:
-    #     - 404: create_event_error_response and alert "Not found No event was found with the id {}"
-    #     - 404: create_user_error_response and alert "Not found No user was found with the id {}"
-    #     - 409: create_event_error_response and alert "Already exists event with id '{}' already exists."
-    #     - 409: create_uesr_error_response and alert "Already exists user with id '{}' already exists."
-    #     - 204: success to edit
-    """    
+        """
+        # modify the information of joining event 
+        # Parameters:
+        #     - user_id: Integer, id of user
+        #     - event_id: Integer, id of event
+        # Response:
+        #     - 404: create_event_error_response and alert "Not found No event was found with the id {}"
+        #     - 404: create_user_error_response and alert "Not found No user was found with the id {}"
+        #     - 409: create_event_error_response and alert "Already exists event with id '{}' already exists."
+        #     - 409: create_uesr_error_response and alert "Already exists user with id '{}' already exists."
+        #     - 204: success to edit
+        """    
         api = Api(current_app)
         event = Event.query.filter_by(id=event_id).first()
         if event is None:
@@ -71,12 +71,17 @@ class JoinEvent(Resource):
         })
 
     def delete(self, user_id, event_id):
-    # """
-    # Delete the information of joined event 
-    # Parameters:
-    #     - user_id: Integer, id of user
-    #     - event_id: Integer, id of event
-    # """  
+        """
+        # Delete the information of joined event 
+        # Parameters:
+        #     - user_id: Integer, id of user
+        #     - event_id: Integer, id of event
+        # Response:
+        #     - 404: create_event_error_response and alert "Doesn't exists event with id '{}' doesn't exist."
+        #     - 404: create_user_error_response and alert "Doesn't exists user with id '{}' doesn't exist."
+        #     - 404: create_error_response and alert "Doesn't exists user with id '{}' doesn't exist in event with id '{}' 
+        #     - 204: success to delete
+        """  
         api = Api(current_app)
 
         event = Event.query.filter_by(id=event_id).first()

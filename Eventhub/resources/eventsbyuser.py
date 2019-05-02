@@ -26,23 +26,23 @@ class EventsByUser(Resource):
     Resource class for representing all events for particular user
     """
     def get(self, user_id):
-    """
-    # get all events information for particular user 
-    # Parameters:
-    #     - id: Integer, id of event
-    # Information:
-    #     - name: String, name of event
-    #     - description: String, description of event
-    #     - place: String, place of event
-    #     - time: DataTime, time of event
-    #     - creator_id: Integer, creator's id of event
-    #     - join_users: users_id, Integer, id of user
-    #                   users_name, String, name of user
-    # Response:
-    #     - 404: create_event_error_response and alert "Not found No user was found with the id {}"
-    #     - 400: Found something else and get KeyError and ValueError
-    #     - 200: Return information of all events of the user(returns a Mason document)
-    """
+        """
+        # get all events information for particular user 
+        # Parameters:
+        #     - id: Integer, id of event
+        # Information:
+        #     - name: String, name of event
+        #     - description: String, description of event
+        #     - place: String, place of event
+        #     - time: DataTime, time of event
+        #     - creator_id: Integer, creator's id of event
+        #     - join_users: users_id, Integer, id of user
+        #                   users_name, String, name of user
+        # Response:
+        #     - 404: create_event_error_response and alert "Not found No user was found with the id {}"
+        #     - 400: Found something else and get KeyError and ValueError
+        #     - 200: Return information of all events of the user(returns a Mason document)
+        """
         api = Api(current_app)
         body = InventoryBuilder(items=[])
         user = User.query.filter_by(id=user_id).first()

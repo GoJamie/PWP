@@ -25,11 +25,19 @@ class UserCollection(Resource):
     """
     Resource class for representing all users
     """
-    #used for 
-    #@jwt_required
     def get(self):
         """
-        Return information of all users (returns a Mason document) if found otherwise returns 404
+        # Return information of all users (returns a Mason document) if found otherwise returns 404
+        # get all users information
+        # Information:
+        #     - id: Interger, id of user
+        #     - name: String, name of user
+        #     - place: String, location of user
+        #     - join_events: event_id, Integer, id of event
+        #                    event_name, String, name of event
+        # Response:
+        #     - 400: Found something else and get KeyError and ValueError
+        #     - 200: Return information of all users (returns a Mason document)
         """
         api = Api(current_app)
 
@@ -58,13 +66,18 @@ class UserCollection(Resource):
             abort(400)
 
     def post(self):
-    # """
-    # post information for new user
-    # Parameters:
-    #     - username: String, username of user
-    #     - name: String, name of user
-    #     - password: String, password of user
-    # """
+        """
+        # post information for new user
+        # Parameters:
+        #     - username: String, username of user
+        #     - name: String, name of user
+        #     - password: String, password of user
+        # Response:
+        #     - 415: create_user_error_response and alert "Unsupported media type Requests must be JSON"
+        #     - 400: create_user_error_response and alert "Invalid JSON document"
+        #     - 409: create_user_error_response and alert "Already exists Product with handle '{}' already exists."
+        #     - 201: success to post
+        """
     
         api = Api(current_app)
         if not request.json:

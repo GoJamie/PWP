@@ -26,11 +26,23 @@ class UserItem(Resource):
     api = Api(current_app)
 
     def get(self, id):
-    # """
-    # get specific information for particular user
-    # Parameters:
-    #     - id: Integer, id of user
-    # """
+        """
+        # get specific information for particular user
+        # Parameters:
+        #     - id: Integer, id of user
+        # Information:
+        #     - name: String, name of user
+        #     - location: String, location of user
+        #     - username: String, username of user
+        #     - Created_events: - id: Integer, id of event
+        #                       - name: String, name of event
+        #                       - description: String, description of event
+        #                       - place: String, place of event
+        #                       - time: DataTime, time of event
+        # Response:
+        #     - 404: create_user_error_response and alert "Not found No user was found with the id {}"
+        #     - 200: Return information of this user (returns a Mason document)
+        """
         print(id)
         id = int(id)
         api = Api(current_app)
@@ -73,11 +85,18 @@ class UserItem(Resource):
 
 
     def put(self, id):
-    # """
-    # modify specific information for particular user
-    # Parameters:
-    #     - id: Integer, id of user
-    # """
+        """
+        # modify specific information for particular user
+        # Parameters:
+        #     - id: Integer, id of user
+        #     - name: String, name of user
+        #     - location: String, location of user
+        # Response:
+        #     - 415: create_user_error_response and alert "Unsupported media type Requests must be JSON"
+        #     - 400: create_user_error_response and alert "Invalid JSON document"
+        #     - 404: create_user_error_response and alert "Not found No user was found with the id {}"
+        #     - 204: success to edit
+        """
         api = Api(current_app)
         if not request.json:
             return create_user_error_response(415, "Unsupported media type",
@@ -97,7 +116,7 @@ class UserItem(Resource):
         db_user = User.query.filter_by(id=id).first()
         if db_user is None:
             return create_user_error_response(404, "Not found",
-                                         "No product was found with the id {}".format(
+                                         "No user was found with the id {}".format(
                                              id)
                                          )
 
@@ -112,23 +131,26 @@ class UserItem(Resource):
         })
 
     def delete(self, id):
-    # """
-    # delete specific information for particular user
-    # Parameters:
-    #     - id: Integer, id of user
-    # """
-    #     '''
-    #     user = User(
-    #         id=request.json["id"]
-    #     )
-        
-    #     loginUser = LoginUser(
-    #         id=request.json["id"]
-    #     )
+        """
+        # delete specific information for particular user
+        # Parameters:
+        #     - id: Integer, id of user
+        # Response:
+        #     - 404: create_user_error_response and alert "Not found No user was found with the id {}"
+        #     - 204: success to delete
+        """
+        #     '''
+        #     user = User(
+        #         id=request.json["id"]
+        #     )
+            
+        #     loginUser = LoginUser(
+        #         id=request.json["id"]
+        #     )
 
-    #     db_user = User.query.filter_by(id=id).first()
-    #     loginUser = LoginUser.query.filter_by(id=id).first()
-    #     '''
+        #     db_user = User.query.filter_by(id=id).first()
+        #     loginUser = LoginUser.query.filter_by(id=id).first()
+        #     '''
         api = Api(current_app)
         user=db.session.query(LoginUser).get(id)
 
@@ -160,6 +182,16 @@ parser.add_argument('password', help = 'This field cannot be blank', required = 
 
 class UserLogin(Resource):
     def post(self):
+        """
+        # post information for login user
+        # Parameters:
+        #     - username: String, username of user
+        #     - password: String, password of user
+        # Response:
+        #     - 'message': 'User {} doesn\'t exist'
+        #     - 'Wrong credentials'
+        """
+
         print(request.json)
         data = parser.parse_args()
         

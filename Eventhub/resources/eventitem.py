@@ -22,22 +22,22 @@ class EventItem(Resource):
     Resource class for representing particular event
     """
     def get(self, id):
-    """
-    # get specific information for particular event 
-    # Parameters:
-    #     - id: Integer, id of event
-    # Response:
-    #     - 404: create_event_error_response and alert "Not found No event was found with the id {}"
-    #     - 200: Return information of the event (returns a Mason document)
-    # Information:
-    #     - name: String, name of event
-    #     - description: String, description of event
-    #     - place: String, place of event
-    #     - time: DataTime, time of event
-    #     - creator_id: Integer, creator's id of event
-    #     - join_users: users_id, Integer, id of user
-    #                   users_name, String, name of user
-    """
+        """
+        # get specific information for particular event 
+        # Parameters:
+        #     - id: Integer, id of event
+        # Response:
+        #     - 404: create_event_error_response and alert "Not found No event was found with the id {}"
+        #     - 200: Return information of the event (returns a Mason document)
+        # Information:
+        #     - name: String, name of event
+        #     - description: String, description of event
+        #     - place: String, place of event
+        #     - time: DataTime, time of event
+        #     - creator_id: Integer, creator's id of event
+        #     - join_users: users_id, Integer, id of user
+        #                   users_name, String, name of user
+        """
         api = Api(current_app)
         db_event = Event.query.filter_by(id=id).first()
         if db_event is None:
@@ -77,20 +77,20 @@ class EventItem(Resource):
         return Response(json.dumps(body), 200, mimetype=MASON)
 
     def put(self, id):
-    """
-    # modify specific information for particular event 
-    # Parameters:
-    #     - id: Integer, id of event
-    #     - name: String, name of event
-    #     - description: String, description of event
-    #     - place: String, place of event
-    #     - time: DataTime, time of event
-    # Response:
-    #     - 415: create_event_error_response and alert "Unsupported media type Requests must be JSON"
-    #     - 404: create_event_error_response and alert "Not found No event was found with the id {}"
-    #     - 400: create_event_error_response and alert "Invalid JSON document"
-    #     - 204: success to edit
-    """
+        """
+        # modify specific information for particular event 
+        # Parameters:
+        #     - id: Integer, id of event
+        #     - name: String, name of event
+        #     - description: String, description of event
+        #     - place: String, place of event
+        #     - time: DataTime, time of event
+        # Response:
+        #     - 415: create_event_error_response and alert "Unsupported media type Requests must be JSON"
+        #     - 404: create_event_error_response and alert "Not found No event was found with the id {}"
+        #     - 400: create_event_error_response and alert "Invalid JSON document"
+        #     - 204: success to edit
+        """
         api = Api(current_app)
         if not request.json:
             return create_event_error_response(415, "Unsupported media type",
