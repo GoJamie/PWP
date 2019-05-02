@@ -31,4 +31,4 @@ You can use command `pytest db_test.py` to test database.
 
 Before running and testing the API, you need to set `FLASK_APP` and `FLASK_ENV`, and run ti by using command `flask run`. We use `rs_test.py` in `tests` folder to test resource and API.
 
-You can use command `pytest db_test.py` to test API.
+You can use command `pytest db_test.py` to test database.
