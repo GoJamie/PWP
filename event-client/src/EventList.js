@@ -1,14 +1,18 @@
 import React, { Component } from 'react';
 
 import { ListGroup, ListGroupItem } from 'reactstrap';
+import AddEvent from './AddEvent';
 
 export default class EventList extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      events: []
+      events: [],
+      update: false
     };
+
+    this.update = this.update.bind(this);
   }
 
   componentDidMount() {
@@ -26,19 +30,20 @@ export default class EventList extends Component {
     };
 
     request().then(data => {
-      console.log(data);
       this.setState({
         events: data.items
       });
     });
   }
+  update() {
+    this.setState(prevState => ({
+      update: !prevState.update
+    }));
+  }
   render() {
-    console.log(this.state);
     let listgroup = [];
     if (this.state.events.length > 0) {
       this.state.events.forEach(event => {
-        console.log(event['@controls'].self.href);
-
         listgroup.push(
           <ListGroupItem tag="a" href={event['@controls'].self.href}>
             {event.name}
@@ -47,6 +52,15 @@ export default class EventList extends Component {
       });
     }
 
-    return <ListGroup>{listgroup}</ListGroup>;
+    return (
+      <div>
+        {localStorage.getItem('token') !== null ? (
+          <ListGroup>{listgroup}</ListGroup>
+        ) : (
+          undefined
+        )}
+        <AddEvent update={this.update} />
+      </div>
+    );
   }
 }

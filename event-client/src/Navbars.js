@@ -45,9 +45,11 @@ export default class Navbars extends Component {
     });
   }
   render() {
-    console.log(localStorage.getItem('message'));
+    let profilelink = '';
+    if (localStorage.getItem('userId') !== null) {
+      profilelink = '/api/users/' + localStorage.getItem('userId');
+    }
 
-    console.log(localStorage.getItem('token'));
     return (
       <div>
         <Navbar color="light" light expand="md">
@@ -56,12 +58,23 @@ export default class Navbars extends Component {
             <NavItem>
               <NavLink href="/api/events/">Events</NavLink>
             </NavItem>
+            {this.state.logged || localStorage.getItem('userId') !== null ? (
+              <NavItem>
+                <NavLink href={profilelink}>Profile Page</NavLink>
+              </NavItem>
+            ) : (
+              undefined
+            )}
+
             {this.state.logged || localStorage.getItem('token') !== null ? (
               <div>
                 <h3>{localStorage.getItem('message')}</h3>
                 <button
                   onClick={() => {
                     localStorage.removeItem('token');
+                    localStorage.removeItem('userId');
+                    localStorage.removeItem('message');
+
                     this.setState({
                       logged: false
                     });

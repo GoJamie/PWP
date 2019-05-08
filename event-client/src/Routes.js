@@ -4,6 +4,8 @@ import EventList from './EventList';
 
 import EventInfo from './EventInfo';
 
+import ProfilePage from './ProfilePage';
+
 // The Main component renders one of the three provided
 // Routes (provided that one matches). Both the /roster
 // and /schedule routes will match any pathname that starts
@@ -14,6 +16,8 @@ const Routes = () => (
     <Switch>
       <Route exact path="/api/events/" component={EventList} />
       <Route exact path="/api/events/:eventid" component={EventInfo} />
+
+      <Route exact path="/api/users/:userid" component={ProfilePage} />
     </Switch>
   </main>
 );

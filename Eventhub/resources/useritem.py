@@ -43,7 +43,7 @@ class UserItem(Resource):
         #     - 404: create_user_error_response and alert "Not found No user was found with the id {}"
         #     - 200: Return information of this user (returns a Mason document)
         """
-        print(id)
+        
         id = int(id)
         api = Api(current_app)
         User.query.all()
@@ -98,6 +98,7 @@ class UserItem(Resource):
         #     - 204: success to edit
         """
         api = Api(current_app)
+        print(request.json)
         if not request.json:
             return create_user_error_response(415, "Unsupported media type",
                                          "Requests must be JSON"
@@ -198,18 +199,23 @@ class UserLogin(Resource):
         
     
         current_user = LoginUser.query.filter_by(username=data['username']).first()
-        print(current_user.password_hash)
 
         if not current_user:
-            return {'message': 'User {} doesn\'t exist'.format(data['username'])}
+            return {'message': 'User {} doesn\'t exist'.format(data['username']),
+            'logged': False
+            }
         
         if LoginUser.verify_hash(data['password'], current_user.password_hash):
             access_token = create_access_token(identity = data['username'])
             return {
                 'message': 'Logged in as {}'.format(current_user.username),
-                'access_token': access_token
+                'access_token': access_token,
+                'user_id': current_user.id,
+                'logged': True
                 }
         else:
-            return {'message': 'Wrong credentials'}
+            return {'message': 'Wrong credentials',
+            'logged': False
+            }
 
 

@@ -1,18 +1,19 @@
 import React, { Component } from 'react';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
-import './css/login.css';
-class LoginModal extends Component {
+
+class AddEvent extends Component {
   constructor(props) {
     super(props);
     this.state = {
       modal: false,
-      username: '',
-      password: ''
+      name: '',
+      description: '',
+      location: ''
     };
 
     this.toggle = this.toggle.bind(this);
     this.onTextChange = this.onTextChange.bind(this);
-    this.onLogin = this.onLogin.bind(this);
+    this.onAdd = this.onAdd.bind(this);
   }
 
   toggle() {
@@ -21,23 +22,30 @@ class LoginModal extends Component {
     }));
   }
   onTextChange(e) {
-    if (e.target.id == 'password') {
+    if (e.target.id == 'eventname') {
       this.setState({
-        password: e.target.value
+        name: e.target.value
       });
-    } else if (e.target.id == 'username') {
+    } else if (e.target.id == 'eventlocation') {
       this.setState({
-        username: e.target.value
+        location: e.target.value
+      });
+    } else if (e.target.id == 'eventdescription') {
+      this.setState({
+        description: e.target.value
       });
     }
   }
-  onLogin() {
+  onAdd() {
     const log = {
-      username: this.state.username,
-      password: this.state.password
+      place: this.state.location,
+      description: this.state.description,
+      name: this.state.name,
+      creatorId: parseInt(localStorage.getItem('userId'))
     };
+    console.log(JSON.stringify(log));
     const request = async () => {
-      const response2 = await fetch('http://localhost:5000/api/login', {
+      const response2 = await fetch('http://localhost:5000/api/events/', {
         method: 'POST',
         mode: 'cors',
         body: JSON.stringify(log), // data can be `string` or {object}!
@@ -50,27 +58,22 @@ class LoginModal extends Component {
       return json2;
     };
     request().then(data => {
-      if (data.logged == true) {
-        localStorage.setItem('token', data.access_token);
+      console.log(data);
+      localStorage.setItem('token', data.access_token);
 
-        localStorage.setItem('message', data.message);
+      localStorage.setItem('message', data.message);
 
-        localStorage.setItem('userId', data.user_id);
-
-        this.props.login();
-
-        this.toggle();
-      } else {
-        alert(data.message);
-      }
+      localStorage.setItem('userId', data.user_id);
+      this.props.update();
     });
+    this.toggle();
   }
 
   render() {
     return (
       <div>
         <Button color="primary" onClick={this.toggle}>
-          Login
+          Add new Event
         </Button>
         <Modal
           isOpen={this.state.modal}
@@ -82,23 +85,32 @@ class LoginModal extends Component {
             <div className="container login-container">
               <div className="row">
                 <div className="col-md-12 login-form-1">
-                  <h3>Login for Form 1</h3>
+                  <h3>Adding event</h3>
                   <form>
                     <div className="form-group">
                       <input
-                        id="username"
+                        id="eventname"
                         type="text"
                         className="form-control"
-                        placeholder="Your username *"
+                        placeholder="Your event name *"
                         onChange={this.onTextChange}
                       />
                     </div>
                     <div className="form-group">
                       <input
-                        id="password"
-                        type="password"
-                        class="form-control"
-                        placeholder="Your Password *"
+                        id="eventlocation"
+                        type="text"
+                        className="form-control"
+                        placeholder="Your event location *"
+                        onChange={this.onTextChange}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <input
+                        id="eventdescription"
+                        type="text"
+                        className="form-control"
+                        placeholder="Your event description *"
                         onChange={this.onTextChange}
                       />
                     </div>
@@ -108,8 +120,8 @@ class LoginModal extends Component {
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button color="primary" onClick={this.onLogin}>
-              Login
+            <Button color="primary" onClick={this.onAdd}>
+              Add
             </Button>{' '}
             <Button color="secondary" onClick={this.toggle}>
               Cancel
@@ -121,4 +133,4 @@ class LoginModal extends Component {
   }
 }
 
-export default LoginModal;
+export default AddEvent;
