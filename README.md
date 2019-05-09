@@ -35,4 +35,7 @@ You can use command `pytest rs_test.py` to test API.
 
 ## Running the client
 
-Before running the client, you need to install Node.js <a>https://nodejs.org/en/download/</a>
+Before running the client, you need to install Node.js <a>https://nodejs.org/en/download/</a>. Then navigate to event-client and run  `npm install` for installing all the nesseccary dependencies.
+When you have all dependencies then run `npm run start`. Make sure you already run the server.
+
+
