@@ -33,8 +33,6 @@ def db_handle():
         
     yield db
     
-    os.close(db_fd)
-    os.unlink(db_fname)
 
 def _get_event():
     return Event(
@@ -51,7 +49,6 @@ def _get_user():
     
 def _get_loginuser(number=1):
     user = LoginUser(username='user-{}'.format(number))
-    user.hash_password('password')
     return user
 
 def test_create_instances(db_handle):
@@ -66,6 +63,8 @@ def test_create_instances(db_handle):
     event = _get_event()
     user = _get_user()
     loginuser = _get_loginuser()
+    
+    loginuser.password_hash = loginuser.generate_hash('password')
     loginuser.user = user
     event.creator = user
     event.joined_users.append(user)
