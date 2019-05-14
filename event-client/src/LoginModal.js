@@ -77,12 +77,11 @@ class LoginModal extends Component {
           toggle={this.toggle}
           className={this.props.className}
         >
-          <ModalHeader toggle={this.toggle}>Modal title</ModalHeader>
+          <ModalHeader toggle={this.toggle}>Modal Login</ModalHeader>
           <ModalBody>
             <div className="container login-container">
               <div className="row">
                 <div className="col-md-12 login-form-1">
-                  <h3>Login for Form 1</h3>
                   <form>
                     <div className="form-group">
                       <input
